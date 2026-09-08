@@ -190,16 +190,29 @@ export function PhoneJourney() {
     ScrollTrigger.update();
   });
 
-  // Pause WebGL when the journey pin leaves the viewport
+  // Pause WebGL when off-screen or tab is hidden
   useEffect(() => {
     const pin = pinRef.current;
     if (!pin || typeof IntersectionObserver === "undefined") return;
+
+    let inView = true;
+    const sync = () => {
+      setCanvasActive(inView && document.visibilityState === "visible");
+    };
+
     const io = new IntersectionObserver(
-      ([entry]) => setCanvasActive(entry.isIntersecting),
-      { root: null, threshold: 0.02, rootMargin: "80px" }
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        sync();
+      },
+      { root: null, threshold: 0.02, rootMargin: "60px" }
     );
     io.observe(pin);
-    return () => io.disconnect();
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
   }, []);
 
   // Reliable Lenis snap: wait until wheel inertia dies, then finish onto a hold
@@ -355,20 +368,29 @@ export function PhoneJourney() {
 
   return (
     <section ref={sectionRef} className="relative h-[820vh]">
-      <div ref={pinRef} className="relative h-[100svh] overflow-hidden bg-bg">
+      <div
+        ref={pinRef}
+        className="relative h-[100svh] overflow-hidden bg-[#050508]"
+      >
         {/* CSS space field — depth without WebGL particle cost */}
-        <div className="journey-space pointer-events-none absolute inset-0" aria-hidden />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.1),transparent_55%)]" />
+        <div
+          className="journey-space pointer-events-none absolute inset-0"
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.08),transparent_55%)]" />
 
         <div className="absolute inset-0 z-[1]">
-          <PhoneJourneyCanvas snapshotRef={snapshotRef} active={canvasActive} />
+          <PhoneJourneyCanvas
+            snapshotRef={snapshotRef}
+            active={canvasActive}
+          />
         </div>
 
         <div
           className={`pointer-events-none absolute inset-0 z-[2] transition-opacity duration-500 ${veil}`}
           style={{ opacity: chapterOpacity }}
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-36 bg-gradient-to-t from-bg to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-36 bg-gradient-to-t from-[#050508] to-transparent" />
 
         <Shell wide className="relative z-[3] h-full">
           <div className="relative h-full">

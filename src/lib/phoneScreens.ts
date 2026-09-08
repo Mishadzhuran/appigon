@@ -34,7 +34,7 @@ function roundRect(
   ctx.moveTo(x + radius, y);
   ctx.arcTo(x + w, y, x + w, y + h, radius);
   ctx.arcTo(x + w, y + h, x, y + h, radius);
-  ctx.arcTo(x + w, y + h, x, y, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
   ctx.arcTo(x, y, x + w, y, radius);
   ctx.closePath();
 }
@@ -83,8 +83,8 @@ export function paintPhoneScreen(
 
   if (holo > 0.02) {
     ctx.save();
-    ctx.globalAlpha = 0.45 * holo * flicker;
-    const bloom = ctx.createRadialGradient(cx, cy, 8, cx, cy, 210);
+    ctx.globalAlpha = 0.42 * holo * flicker;
+    const bloom = ctx.createRadialGradient(cx, cy, 6, cx, cy, 180);
     bloom.addColorStop(0, "rgba(239,26,18,0.55)");
     bloom.addColorStop(0.45, "rgba(239,26,18,0.12)");
     bloom.addColorStop(1, "rgba(239,26,18,0)");
@@ -94,7 +94,7 @@ export function paintPhoneScreen(
   }
 
   ctx.fillStyle = "#050505";
-  roundRect(ctx, SCREEN_W / 2 - 70, 16, 140, 30, 15);
+  roundRect(ctx, SCREEN_W / 2 - 62, 14, 124, 26, 13);
   ctx.fill();
 
   if (holo < 0.02) return;
@@ -104,7 +104,7 @@ export function paintPhoneScreen(
     ctx.save();
     ctx.globalAlpha = holo * flicker;
     ctx.shadowColor = "rgba(239,26,18,1)";
-    ctx.shadowBlur = 28;
+    ctx.shadowBlur = 22;
     drawHoloIcon(ctx, holoIndex, cx, cy, iconSize * breath, RED);
     ctx.restore();
     return;
@@ -116,18 +116,18 @@ export function paintPhoneScreen(
   bctx.clearRect(0, 0, HOLO_BOX, HOLO_BOX);
 
   const glitchOn = Math.sin(t * 4.6) > 0.82;
-  const gx = glitchOn ? (hash(t * 33) - 0.5) * 8 : 0;
-  const gy = glitchOn ? (hash(t * 51) - 0.5) * 5 : 0;
+  const gx = glitchOn ? (hash(t * 33) - 0.5) * 7 : 0;
+  const gy = glitchOn ? (hash(t * 51) - 0.5) * 4 : 0;
 
-  // Single soft ghost + main mark (was 3 full draws)
+  // One soft ghost + main mark
   bctx.save();
-  bctx.globalAlpha = flicker * 0.2;
-  bctx.shadowColor = "rgba(255,70,50,0.6)";
-  bctx.shadowBlur = 12;
+  bctx.globalAlpha = flicker * 0.18;
+  bctx.shadowColor = "rgba(255,70,50,0.55)";
+  bctx.shadowBlur = 10;
   drawHoloIcon(
     bctx,
     holoIndex,
-    mid - 4 + gx * 0.4,
+    mid - 3 + gx * 0.4,
     mid + 2,
     iconSize * breath * 0.97,
     "#ff5a45"
@@ -137,7 +137,7 @@ export function paintPhoneScreen(
   bctx.save();
   bctx.globalAlpha = flicker;
   bctx.shadowColor = "rgba(239,26,18,1)";
-  bctx.shadowBlur = 22 + Math.sin(t * 4.2) * 6;
+  bctx.shadowBlur = 18 + Math.sin(t * 4.2) * 5;
   drawHoloIcon(
     bctx,
     holoIndex,
@@ -153,20 +153,20 @@ export function paintPhoneScreen(
   bctx.globalCompositeOperation = "source-atop";
   bctx.globalAlpha = 0.1 * flicker;
   bctx.fillStyle = RED;
-  for (let y = 0; y < HOLO_BOX; y += 8) {
+  for (let y = 0; y < HOLO_BOX; y += 10) {
     bctx.fillRect(Math.sin(y * 0.1 + t * 5) * 1.2, y, HOLO_BOX, 1);
   }
   if (glitchOn) {
-    const sliceY = mid + (hash(Math.floor(t * 6)) - 0.5) * 70;
-    bctx.globalAlpha = 0.3 * flicker;
-    bctx.fillRect(20, sliceY, HOLO_BOX - 40, 1.5);
+    const sliceY = mid + (hash(Math.floor(t * 6)) - 0.5) * 60;
+    bctx.globalAlpha = 0.28 * flicker;
+    bctx.fillRect(16, sliceY, HOLO_BOX - 32, 1.5);
   }
   bctx.restore();
 
   ctx.save();
   ctx.globalAlpha = holo;
-  ctx.shadowColor = "rgba(239,26,18,0.85)";
-  ctx.shadowBlur = 22;
+  ctx.shadowColor = "rgba(239,26,18,0.8)";
+  ctx.shadowBlur = 18;
   ctx.drawImage(buf, cx - mid, cy - mid);
   ctx.restore();
 }
