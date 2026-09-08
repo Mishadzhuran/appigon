@@ -1,12 +1,27 @@
+import dynamic from "next/dynamic";
 import { PhoneJourney } from "@/components/home/PhoneJourney";
 import { Marquee } from "@/components/home/Marquee";
-import {
-  CasesPreview,
-  ConversionSection,
-  FinalCTA,
-  ServicesPreview,
-  StatsStrip,
-} from "@/components/home/Sections";
+
+const StatsStrip = dynamic(
+  () => import("@/components/home/Sections").then((m) => m.StatsStrip),
+  { ssr: true }
+);
+const ConversionSection = dynamic(
+  () => import("@/components/home/Sections").then((m) => m.ConversionSection),
+  { ssr: true }
+);
+const ServicesPreview = dynamic(
+  () => import("@/components/home/Sections").then((m) => m.ServicesPreview),
+  { ssr: true }
+);
+const CasesPreview = dynamic(
+  () => import("@/components/home/Sections").then((m) => m.CasesPreview),
+  { ssr: true }
+);
+const FinalCTA = dynamic(
+  () => import("@/components/home/Sections").then((m) => m.FinalCTA),
+  { ssr: true }
+);
 
 export default function HomePage() {
   return (

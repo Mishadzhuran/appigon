@@ -7,7 +7,7 @@ import { useGLTF } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { JourneySnapshot } from "@/lib/journeyMotion";
-import { paintPhoneScreen } from "@/lib/phoneScreens";
+import { SCREEN_H, SCREEN_W, paintPhoneScreen } from "@/lib/phoneScreens";
 
 type GLTFResult = {
   nodes: Record<string, THREE.Mesh>;
@@ -22,16 +22,17 @@ export function IPhoneModel({
   const { nodes, materials } = useGLTF("/models/scene.glb") as unknown as GLTFResult;
   const screenMat = useRef<THREE.MeshBasicMaterial>(null);
   const lastKey = useRef("");
+  const paintAcc = useRef(0);
 
   const screenTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const c = document.createElement("canvas");
-    c.width = 1170;
-    c.height = 2532;
+    c.width = SCREEN_W;
+    c.height = SCREEN_H;
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.flipY = true;
-    tex.anisotropy = 8;
+    tex.anisotropy = 1;
     tex.minFilter = THREE.LinearFilter;
     tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = false;
@@ -49,8 +50,9 @@ export function IPhoneModel({
         name !== "pIJKfZsazmcpEiU"
       ) {
         mat.color = new THREE.Color("#2a2a32");
-        mat.metalness = 0.92;
-        mat.roughness = 0.3;
+        mat.metalness = 0.88;
+        mat.roughness = 0.35;
+        mat.envMapIntensity = 0.35;
         mat.needsUpdate = true;
       }
     });
@@ -63,45 +65,57 @@ export function IPhoneModel({
     screenMat.current.needsUpdate = true;
   }, [screenTexture]);
 
-  useFrame((state) => {
+  useFrame((state, dt) => {
     if (!screenTexture) return;
-    const ctx = (screenTexture.image as HTMLCanvasElement).getContext("2d");
-    if (!ctx) return;
     const snap = snapshotRef.current;
-    const t = state.clock.elapsedTime;
+    // ~10fps screen paint — hologram still reads as alive
+    paintAcc.current += dt;
+    const force =
+      lastKey.current === "" ||
+      !lastKey.current.startsWith(`${snap.holoIndex}|`);
+    if (!force && paintAcc.current < 0.1) return;
+    paintAcc.current = 0;
 
-    // Repaint often for hologram flicker
+    const ctx = (screenTexture.image as HTMLCanvasElement).getContext("2d", {
+      willReadFrequently: false,
+    });
+    if (!ctx) return;
+    const t = state.clock.elapsedTime;
     const key = [
       snap.holoIndex,
       snap.holo.toFixed(2),
       snap.power.toFixed(2),
-      Math.floor(t * 20),
+      Math.floor(t * 10),
     ].join("|");
 
-    if (key !== lastKey.current) {
-      lastKey.current = key;
-      paintPhoneScreen(ctx, {
-        chapterIndex: snap.chapter,
-        holoIndex: snap.holoIndex,
-        morph: 1,
-        title: snap.title,
-        line: snap.line,
-        body: snap.body,
-        bullets: snap.bullets,
-        detail: 0,
-        holo: snap.holo,
-        power: snap.power,
-        time: t,
-      });
-      screenTexture.needsUpdate = true;
-    }
+    if (key === lastKey.current) return;
+    lastKey.current = key;
+    paintPhoneScreen(ctx, {
+      chapterIndex: snap.chapter,
+      holoIndex: snap.holoIndex,
+      morph: 1,
+      title: snap.title,
+      line: snap.line,
+      body: snap.body,
+      bullets: snap.bullets,
+      detail: 0,
+      holo: snap.holo,
+      power: snap.power,
+      time: t,
+    });
+    screenTexture.needsUpdate = true;
   });
 
   const s = 0.01;
 
   return (
     <group dispose={null}>
-      <mesh geometry={nodes.ttmRoLdJipiIOmf.geometry} material={materials.hUlRcbieVuIiOXG} scale={s} />
+      <mesh
+        geometry={nodes.ttmRoLdJipiIOmf.geometry}
+        material={materials.hUlRcbieVuIiOXG}
+        scale={s}
+        frustumCulled
+      />
       <mesh geometry={nodes.DjsDkGiopeiEJZK.geometry} material={materials.PaletteMaterial001} scale={s} />
       <mesh geometry={nodes.buRWvyqhBBgcJFo.geometry} material={materials.PaletteMaterial002} scale={s} />
       <mesh geometry={nodes.MrMmlCAsAxJpYqQ_0.geometry} material={materials.dxCVrUCvYhjVxqy} scale={s} />
@@ -144,4 +158,7 @@ export function IPhoneModel({
   );
 }
 
-useGLTF.preload("/models/scene.glb");
+// Preload only when journey canvas mounts (called from PhoneJourneyCanvas)
+export function preloadPhoneModel() {
+  useGLTF.preload("/models/scene.glb");
+}

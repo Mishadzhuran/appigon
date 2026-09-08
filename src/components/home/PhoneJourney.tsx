@@ -177,7 +177,9 @@ export function PhoneJourney() {
   const lastChapter = useRef(0);
   const [snapshot, setSnapshot] = useState<JourneySnapshot>(snapshotJourney(0));
   const [hudProgress, setHudProgress] = useState(0);
+  const [canvasActive, setCanvasActive] = useState(true);
   const rafGate = useRef(0);
+  const hudGate = useRef(0);
   const stRef = useRef<ScrollTrigger | null>(null);
   const snapping = useRef(false);
   const lastDir = useRef(0);
@@ -188,6 +190,18 @@ export function PhoneJourney() {
     ScrollTrigger.update();
   });
 
+  // Pause WebGL when the journey pin leaves the viewport
+  useEffect(() => {
+    const pin = pinRef.current;
+    if (!pin || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setCanvasActive(entry.isIntersecting),
+      { root: null, threshold: 0.02, rootMargin: "80px" }
+    );
+    io.observe(pin);
+    return () => io.disconnect();
+  }, []);
+
   // Reliable Lenis snap: wait until wheel inertia dies, then finish onto a hold
   useEffect(() => {
     if (!lenis) return;
@@ -197,7 +211,6 @@ export function PhoneJourney() {
     const finishToHold = () => {
       const st = stRef.current;
       if (!st) return;
-      // Active while pinned through the journey span
       const inRange =
         lenis.scroll >= st.start - 2 && lenis.scroll <= st.end + 2;
       if (!inRange || snapping.current) return;
@@ -238,7 +251,6 @@ export function PhoneJourney() {
       if (snapping.current) return;
 
       clearTimeout(settleTimer);
-      // Only settle when Lenis has nearly stopped
       if (Math.abs(e.velocity) > 0.15) return;
 
       settleTimer = setTimeout(() => {
@@ -272,13 +284,18 @@ export function PhoneJourney() {
         onUpdate: (self) => {
           const next = snapshotJourney(self.progress);
           snapshotRef.current = next;
-          setHudProgress(self.progress);
 
           const now = performance.now();
+          if (now - hudGate.current > 80) {
+            hudGate.current = now;
+            setHudProgress(self.progress);
+          }
+
           const chapterChanged = next.chapter !== lastChapter.current;
           if (chapterChanged) lastChapter.current = next.chapter;
 
-          if (chapterChanged || now - rafGate.current > 28) {
+          // ~16fps React text updates — 3D reads snapshotRef every frame
+          if (chapterChanged || now - rafGate.current > 60) {
             rafGate.current = now;
             setSnapshot(next);
           }
@@ -288,7 +305,6 @@ export function PhoneJourney() {
 
     const refresh = () => ScrollTrigger.refresh();
     refresh();
-    // Second refresh after layout settles (pin distances)
     const t = window.setTimeout(refresh, 120);
     window.addEventListener("resize", refresh);
     return () => {
@@ -334,16 +350,18 @@ export function PhoneJourney() {
   const layout = CHAPTER_LAYOUTS[snapshot.chapter] ?? CHAPTER_LAYOUTS[0];
   const veil =
     layout.side === "left"
-      ? "bg-[linear-gradient(90deg,rgba(5,5,6,0.72)_0%,rgba(5,5,6,0.18)_40%,rgba(5,5,6,0)_65%)]"
-      : "bg-[linear-gradient(270deg,rgba(5,5,6,0.72)_0%,rgba(5,5,6,0.18)_40%,rgba(5,5,6,0)_65%)]";
+      ? "bg-[linear-gradient(90deg,rgba(5,5,6,0.55)_0%,rgba(5,5,6,0.12)_40%,rgba(5,5,6,0)_65%)]"
+      : "bg-[linear-gradient(270deg,rgba(5,5,6,0.55)_0%,rgba(5,5,6,0.12)_40%,rgba(5,5,6,0)_65%)]";
 
   return (
     <section ref={sectionRef} className="relative h-[820vh]">
       <div ref={pinRef} className="relative h-[100svh] overflow-hidden bg-bg">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.14),transparent_55%)]" />
+        {/* CSS space field — depth without WebGL particle cost */}
+        <div className="journey-space pointer-events-none absolute inset-0" aria-hidden />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.1),transparent_55%)]" />
 
         <div className="absolute inset-0 z-[1]">
-          <PhoneJourneyCanvas snapshotRef={snapshotRef} />
+          <PhoneJourneyCanvas snapshotRef={snapshotRef} active={canvasActive} />
         </div>
 
         <div

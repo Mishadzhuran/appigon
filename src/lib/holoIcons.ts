@@ -218,8 +218,8 @@ function getIconCanvas() {
   if (typeof document === "undefined") return null;
   if (!iconCanvas) {
     iconCanvas = document.createElement("canvas");
-    iconCanvas.width = 1000;
-    iconCanvas.height = 1000;
+    iconCanvas.width = 512;
+    iconCanvas.height = 512;
   }
   return iconCanvas;
 }
