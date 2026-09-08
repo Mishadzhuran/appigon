@@ -274,19 +274,23 @@ export function phonePoseFromProgress(p: number): PhonePose {
     };
   }
 
-  // --- Outro: sink face-down ---
+  // --- Outro: sink face-down with room under the stage ---
   if (p >= OUTRO_START) {
     const last = restPose(CHAPTER_COUNT - 1);
     const e = easeInOutQuint(outro);
     return {
       x: lerp(last.x, 0.03, easeInOutQuint(smoothstep(0, 0.75, outro))),
-      y: lerp(0.2, -2.2, easeInOutQuint(smoothstep(0.08, 1, outro))),
+      y: lerp(0.2, -2.05, easeInOutQuint(smoothstep(0.08, 1, outro))),
       z: lerp(0.04, 0.1, e),
       yaw: lerp(last.yaw, Math.PI, easeInOutQuint(smoothstep(0, 0.7, outro))),
-      pitch: lerp(last.pitch, Math.PI / 2, easeInOutQuint(smoothstep(0.05, 0.95, outro))),
+      pitch: lerp(
+        last.pitch,
+        Math.PI / 2,
+        easeInOutQuint(smoothstep(0.05, 0.95, outro))
+      ),
       roll: lerp(last.roll, 0, easeInOutQuint(smoothstep(0, 0.55, outro))),
-      scale: lerp(stageScale, stageScale * 0.9, e),
-      camZ: lerp(nearCam, farCam, e),
+      scale: lerp(stageScale, stageScale * 0.78, e),
+      camZ: lerp(nearCam, farCam + 1.6, e),
     };
   }
 

@@ -390,7 +390,7 @@ export function PhoneJourney() {
           className={`pointer-events-none absolute inset-0 z-[2] transition-opacity duration-500 ${veil}`}
           style={{ opacity: chapterOpacity }}
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-36 bg-gradient-to-t from-[#050508] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-52 bg-gradient-to-t from-[#050508] via-[#050508]/85 to-transparent md:h-64" />
 
         <Shell wide className="relative z-[3] h-full">
           <div className="relative h-full">

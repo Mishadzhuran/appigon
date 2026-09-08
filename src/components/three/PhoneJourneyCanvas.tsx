@@ -28,12 +28,13 @@ function SoftEnvironment() {
     const envScene = new RoomEnvironment();
     const rt = pmrem.fromScene(envScene, 0.04);
     scene.environment = rt.texture;
-    scene.environmentIntensity = 0.95;
+    scene.environmentIntensity = 0.9;
 
     return () => {
       scene.environment = null;
       rt.dispose();
       pmrem.dispose();
+      envScene.clear();
     };
   }, [gl, scene]);
 
@@ -63,17 +64,17 @@ function makeRadialTexture(
   ctx.fillRect(0, 0, size, size);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  tex.anisotropy = 2;
   return tex;
 }
 
 function SoftContactShadow() {
   const tex = useMemo(
     () =>
-      makeRadialTexture(256, [
-        [0, "rgba(0,0,0,0.85)"],
-        [0.35, "rgba(0,0,0,0.4)"],
-        [0.7, "rgba(0,0,0,0.12)"],
+      makeRadialTexture(128, [
+        [0, "rgba(0,0,0,0.7)"],
+        [0.4, "rgba(0,0,0,0.28)"],
+        [0.75, "rgba(0,0,0,0.06)"],
         [1, "rgba(0,0,0,0)"],
       ]),
     []
@@ -84,49 +85,38 @@ function SoftContactShadow() {
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, -2.672, 0]}
+      position={[0, -2.528, 0]}
       renderOrder={-1}
     >
-      <planeGeometry args={[8, 8]} />
+      <planeGeometry args={[5.5, 5.5]} />
       <meshBasicMaterial
         map={tex}
         transparent
-        opacity={0.85}
+        opacity={0.65}
         depthWrite={false}
       />
     </mesh>
   );
 }
 
-/** Premium dark pedestal — layered rings, soft red wash, real depth */
+/**
+ * Outro stage: no pedestal disc — rings float on the space background.
+ * Soft ease-in so the land transition feels continuous with the scroll.
+ */
 function OutroGround({
   snapshotRef,
 }: {
   snapshotRef: React.MutableRefObject<JourneySnapshot>;
 }) {
   const group = useRef<THREE.Group>(null);
-  const bead = useRef<THREE.Mesh>(null);
-
-  const discTex = useMemo(
-    () =>
-      makeRadialTexture(512, [
-        [0, "rgba(8,8,12,1)"],
-        [0.28, "rgba(6,6,9,1)"],
-        [0.55, "rgba(4,4,6,1)"],
-        [0.78, "rgba(239,26,18,0.07)"],
-        [0.9, "rgba(3,3,5,1)"],
-        [1, "rgba(2,2,3,0)"],
-      ]),
-    []
-  );
 
   const glowTex = useMemo(
     () =>
-      makeRadialTexture(256, [
+      makeRadialTexture(128, [
         [0, "rgba(239,26,18,0)"],
-        [0.55, "rgba(239,26,18,0.05)"],
-        [0.78, "rgba(239,26,18,0.35)"],
-        [0.9, "rgba(255,60,45,0.18)"],
+        [0.5, "rgba(239,26,18,0.02)"],
+        [0.72, "rgba(239,26,18,0.22)"],
+        [0.88, "rgba(255,50,40,0.12)"],
         [1, "rgba(239,26,18,0)"],
       ]),
     []
@@ -147,14 +137,6 @@ function OutroGround({
       });
 
     return {
-      abyss: mk("#030305"),
-      disc: new THREE.MeshBasicMaterial({
-        map: discTex ?? undefined,
-        color: discTex ? "#ffffff" : "#050508",
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-      }),
       wash: new THREE.MeshBasicMaterial({
         map: glowTex ?? undefined,
         color: "#ffffff",
@@ -164,136 +146,82 @@ function OutroGround({
         blending: THREE.AdditiveBlending,
       }),
       rimCore: mk("#ef1a12"),
-      rimInner: mk("#ff4a3a"),
+      rimInner: mk("#ff5a45"),
       rimOuter: mk("#ef1a12"),
       rimBloom: mk("#ff2a1a", { blending: THREE.AdditiveBlending }),
-      torus: new THREE.MeshStandardMaterial({
-        color: "#ef1a12",
-        emissive: "#ef1a12",
-        emissiveIntensity: 0,
-        metalness: 0.35,
-        roughness: 0.35,
-        transparent: true,
-        opacity: 0,
-      }),
-      bead: new THREE.MeshStandardMaterial({
-        color: "#ff3b30",
-        emissive: "#ef1a12",
-        emissiveIntensity: 0,
-        metalness: 0.2,
-        roughness: 0.25,
-        transparent: true,
-        opacity: 0,
-      }),
+      torus: mk("#ef1a12"),
     };
-  }, [discTex, glowTex]);
+  }, [glowTex]);
 
-  useFrame((state) => {
+  useFrame(() => {
     const outro = snapshotRef.current.outro;
-    const show = Math.min(1, outro * 1.55);
-    const pulse = 0.92 + Math.sin(state.clock.elapsedTime * 1.6) * 0.08;
+    // Smoothstep so rings ease in with the phone land — no pop
+    const show = outro * outro * (3 - 2 * outro);
 
-    mats.abyss.opacity = show * 0.95;
-    mats.disc.opacity = show;
-    mats.wash.opacity = show * 0.7 * pulse;
-    mats.rimCore.opacity = show * 0.95;
-    mats.rimInner.opacity = show * 0.45;
-    mats.rimOuter.opacity = show * 0.55;
-    mats.rimBloom.opacity = show * 0.28 * pulse;
-    mats.torus.opacity = show * 0.9;
-    mats.torus.emissiveIntensity = show * 1.8 * pulse;
-    mats.bead.opacity = show;
-    mats.bead.emissiveIntensity = show * 2.4;
-    mats.abyss.depthWrite = show > 0.05;
-    mats.disc.depthWrite = show > 0.05;
+    mats.wash.opacity = show * 0.55;
+    mats.rimCore.opacity = show * 0.92;
+    mats.rimInner.opacity = show * 0.4;
+    mats.rimOuter.opacity = show * 0.5;
+    mats.rimBloom.opacity = show * 0.22;
+    mats.torus.opacity = show * 0.85;
 
-    if (group.current) group.current.visible = show > 0.02;
-
-    if (bead.current) {
-      const a = state.clock.elapsedTime * 0.55;
-      const r = 2.85;
-      bead.current.position.set(Math.cos(a) * r, -2.58, Math.sin(a) * r);
-      bead.current.visible = show > 0.15;
-    }
+    if (group.current) group.current.visible = show > 0.015;
   });
 
-  const y = -2.7;
+  const y = -2.55;
 
   return (
     <group ref={group} visible={false}>
-      {/* Far black ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, y, 0]} material={mats.abyss}>
-        <circleGeometry args={[16, 64]} />
-      </mesh>
-
-      {/* Soft additive red wash under the stage */}
+      {/* Soft red wash only — no grey disc, blends into space bg */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, y + 0.012, 0]}
+        position={[0, y + 0.01, 0]}
         material={mats.wash}
       >
-        <circleGeometry args={[4.2, 96]} />
-      </mesh>
-
-      {/* Main pedestal disc with vignette + red edge cue */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, y + 0.018, 0]}
-        material={mats.disc}
-      >
-        <circleGeometry args={[3.35, 128]} />
+        <circleGeometry args={[3.8, 64]} />
       </mesh>
 
       <SoftContactShadow />
 
-      {/* Hairline inner track */}
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, y + 0.024, 0]}
+        material={mats.rimInner}
+      >
+        <ringGeometry args={[2.48, 2.54, 96]} />
+      </mesh>
+
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, y + 0.026, 0]}
+        material={mats.rimBloom}
+      >
+        <ringGeometry args={[2.58, 3.28, 96]} />
+      </mesh>
+
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, y + 0.028, 0]}
-        material={mats.rimInner}
+        material={mats.rimOuter}
       >
-        <ringGeometry args={[2.42, 2.48, 128]} />
+        <ringGeometry args={[3.08, 3.2, 96]} />
       </mesh>
 
-      {/* Soft bloom band */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, y + 0.03, 0]}
-        material={mats.rimBloom}
-      >
-        <ringGeometry args={[2.55, 3.35, 160]} />
-      </mesh>
-
-      {/* Outer soft ring */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, y + 0.032, 0]}
-        material={mats.rimOuter}
-      >
-        <ringGeometry args={[3.05, 3.22, 160]} />
-      </mesh>
-
-      {/* Crisp neon core */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, y + 0.036, 0]}
         material={mats.rimCore}
       >
-        <ringGeometry args={[2.72, 2.92, 160]} />
+        <ringGeometry args={[2.74, 2.9, 96]} />
       </mesh>
 
-      {/* Raised torus for real 3D edge */}
+      {/* Thin raised rim — slight 3D without a platform slab */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, y + 0.055, 0]}
+        position={[0, y + 0.048, 0]}
         material={mats.torus}
       >
-        <torusGeometry args={[2.82, 0.028, 12, 160]} />
-      </mesh>
-
-      {/* Orbiting accent */}
-      <mesh ref={bead} material={mats.bead}>
-        <sphereGeometry args={[0.045, 16, 16]} />
+        <torusGeometry args={[2.82, 0.018, 8, 96]} />
       </mesh>
     </group>
   );
@@ -345,28 +273,30 @@ function ScrollRig({
     }
 
     const o = snap.outro;
+    const oEase = o * o * (3 - 2 * o);
     if (topFill.current) {
-      // Keep phone lit without washing the stand grey
-      topFill.current.intensity = lerp(0.3, 1.85, o);
+      topFill.current.intensity = lerp(0.3, 1.65, oEase);
       topFill.current.position.set(sx.current + 0.35, 7, sz.current + 0.5);
       topFill.current.target.position.set(sx.current, sy.current, sz.current);
       topFill.current.target.updateMatrixWorld();
     }
     if (ringGlow.current) {
-      ringGlow.current.intensity = lerp(0, 1.4, o);
-      ringGlow.current.position.set(sx.current, -2.15, sz.current);
+      // Soft under-glow only — no hard hot-spot orb
+      ringGlow.current.intensity = lerp(0, 0.85, oEase);
+      ringGlow.current.position.set(sx.current, -2.2, sz.current);
     }
 
     camera.position.x = lerp(camera.position.x, -sx.current * 0.1, a);
     camera.position.y = lerp(
       camera.position.y,
-      inOutro ? lerp(0.32, 1.2, snap.outro) : 0.28,
+      // Pull framing up so rings sit mid-frame with space above the marquee
+      inOutro ? lerp(0.32, 1.85, snap.outro) : 0.28,
       a
     );
     camera.position.z = camZ.current;
     look.current.set(
-      sx.current * 0.3,
-      inOutro ? -0.55 * snap.outro : 0.16,
+      sx.current * 0.25,
+      inOutro ? lerp(0.16, -0.15, snap.outro) : 0.16,
       0
     );
     camera.lookAt(look.current);
@@ -386,7 +316,7 @@ function ScrollRig({
         ref={ringGlow}
         intensity={0}
         color="#ff5a45"
-        distance={10}
+        distance={12}
         decay={2}
       />
       <OutroGround snapshotRef={snapshotRef} />
@@ -412,9 +342,9 @@ export function PhoneJourneyCanvas({
     <div className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0.28, 11], fov: 30, near: 0.1, far: 60 }}
-        dpr={[1, 1.5]}
+        dpr={[1, 1.35]}
         frameloop={active ? "always" : "never"}
-        performance={{ min: 0.55, max: 1, debounce: 200 }}
+        performance={{ min: 0.5, max: 1, debounce: 200 }}
         gl={{
           antialias: true,
           alpha: true,
@@ -426,7 +356,7 @@ export function PhoneJourneyCanvas({
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.05;
+          gl.toneMappingExposure = 1.02;
           gl.domElement.style.pointerEvents = "none";
         }}
       >
@@ -434,25 +364,20 @@ export function PhoneJourneyCanvas({
           <fog attach="fog" args={[SPACE, 16, 40]} />
           <SoftEnvironment />
           <ambientLight intensity={0.28} />
-          <hemisphereLight args={["#8a8a98", "#050508", 0.28]} />
+          <hemisphereLight args={["#8a8a98", "#050508", 0.26]} />
           <directionalLight
             position={[5, 8, 4]}
-            intensity={1.85}
+            intensity={1.75}
             color="#ffffff"
           />
           <directionalLight
             position={[-4, 3, -3]}
-            intensity={0.95}
+            intensity={0.9}
             color="#ffc2b8"
-          />
-          <directionalLight
-            position={[0, 2, 6]}
-            intensity={0.7}
-            color="#dfe4ff"
           />
           <pointLight
             position={[-1.2, 1.4, 2.2]}
-            intensity={0.55}
+            intensity={0.5}
             color="#ef1a12"
           />
 

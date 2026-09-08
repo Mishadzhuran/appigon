@@ -34,7 +34,7 @@ function sharpenMaps(mat: THREE.MeshStandardMaterial) {
     mat.emissiveMap,
   ]) {
     if (!tex) continue;
-    tex.anisotropy = 8;
+    tex.anisotropy = 4;
     tex.needsUpdate = true;
   }
 }
