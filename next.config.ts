@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
       "lenis",
     ],
   },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
 };
 
 export default nextConfig;

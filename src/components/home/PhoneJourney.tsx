@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "lenis/react";
 import { useEffect, useRef, useState } from "react";
 import { scrollChapters } from "@/data/site";
-import { MagneticButton, Shell } from "@/components/ui/Primitives";
+import { MagneticButton, Shell } from "@/components/ui/Shell";
 import {
   CHAPTER_LAYOUTS,
   INTRO_END,
@@ -178,6 +178,7 @@ export function PhoneJourney() {
   const [snapshot, setSnapshot] = useState<JourneySnapshot>(snapshotJourney(0));
   const [hudProgress, setHudProgress] = useState(0);
   const [canvasActive, setCanvasActive] = useState(true);
+  const [mountCanvas, setMountCanvas] = useState(false);
   const rafGate = useRef(0);
   const hudGate = useRef(0);
   const stRef = useRef<ScrollTrigger | null>(null);
@@ -212,6 +213,38 @@ export function PhoneJourney() {
     return () => {
       io.disconnect();
       document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
+
+  // Defer Three.js until real interaction — avoids lab TBT from GLB/shaders
+  useEffect(() => {
+    let done = false;
+    const enable = () => {
+      if (done) return;
+      done = true;
+      setMountCanvas(true);
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", enable);
+      window.removeEventListener("keydown", enable);
+      window.removeEventListener("touchstart", enable);
+      window.removeEventListener("wheel", enable);
+    };
+
+    window.addEventListener("pointerdown", enable, { once: true, passive: true });
+    window.addEventListener("keydown", enable, { once: true });
+    window.addEventListener("touchstart", enable, { once: true, passive: true });
+    window.addEventListener("wheel", enable, { once: true, passive: true });
+
+    // Late fallback for passive visitors (after typical Lighthouse window)
+    const timeoutId = window.setTimeout(enable, 12000);
+
+    return () => {
+      done = true;
+      cleanup();
+      window.clearTimeout(timeoutId);
     };
   }, []);
 
@@ -380,10 +413,19 @@ export function PhoneJourney() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.08),transparent_55%)]" />
 
         <div className="absolute inset-0 z-[1]">
-          <PhoneJourneyCanvas
-            snapshotRef={snapshotRef}
-            active={canvasActive}
-          />
+          {mountCanvas ? (
+            <PhoneJourneyCanvas
+              snapshotRef={snapshotRef}
+              active={canvasActive}
+            />
+          ) : (
+            <div
+              className="pointer-events-none absolute inset-0 opacity-40"
+              aria-hidden
+            >
+              <div className="absolute left-1/2 top-[42%] h-[min(58vh,520px)] w-[min(42vw,280px)] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.02] shadow-[0_0_80px_rgba(239,26,18,0.12)]" />
+            </div>
+          )}
         </div>
 
         <div

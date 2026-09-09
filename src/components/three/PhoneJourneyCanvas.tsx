@@ -26,7 +26,7 @@ function SoftEnvironment() {
     const pmrem = new THREE.PMREMGenerator(gl);
     pmrem.compileEquirectangularShader();
     const envScene = new RoomEnvironment();
-    const rt = pmrem.fromScene(envScene, 0.04);
+    const rt = pmrem.fromScene(envScene, 0.08);
     scene.environment = rt.texture;
     scene.environmentIntensity = 0.9;
 
@@ -342,9 +342,9 @@ export function PhoneJourneyCanvas({
     <div className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0.28, 11], fov: 30, near: 0.1, far: 60 }}
-        dpr={[1, 1.35]}
+        dpr={[1, 1.25]}
         frameloop={active ? "always" : "never"}
-        performance={{ min: 0.5, max: 1, debounce: 200 }}
+        performance={{ min: 0.45, max: 1, debounce: 200 }}
         gl={{
           antialias: true,
           alpha: true,

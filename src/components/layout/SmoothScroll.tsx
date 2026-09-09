@@ -1,18 +1,10 @@
 "use client";
 
 import { ReactLenis } from "lenis/react";
-import { ReactNode, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ReactNode } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
-
+/** Lenis only — GSAP stays in the journey chunk, not the root layout */
 export function SmoothScroll({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    ScrollTrigger.refresh();
-    gsap.ticker.lagSmoothing(0);
-  }, []);
-
   return (
     <ReactLenis
       root

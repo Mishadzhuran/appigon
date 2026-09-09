@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Anton, DM_Sans, JetBrains_Mono } from "next/font/google";
-import { CustomCursor } from "@/components/layout/CustomCursor";
+import { Anton, DM_Sans } from "next/font/google";
+import {
+  CustomCursor,
+  PageLoader,
+} from "@/components/layout/ClientChrome";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { PageLoader } from "@/components/layout/PageLoader";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import "./globals.css";
 
@@ -19,14 +21,6 @@ const body = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   display: "swap",
-});
-
-const mono = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -53,13 +47,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full font-body text-text">
         <SmoothScroll>
           <PageLoader />
           <CustomCursor />
-          <div className="grain" aria-hidden />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

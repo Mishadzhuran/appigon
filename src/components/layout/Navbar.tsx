@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { navLinks, site } from "@/data/site";
 
 export function Navbar() {
@@ -45,7 +44,9 @@ export function Navbar() {
                 A
               </span>
             </span>
-            <span className="soft-title text-xl tracking-[0.02em]">{site.name}</span>
+            <span className="soft-title text-xl tracking-[0.02em]">
+              {site.name}
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
@@ -84,7 +85,9 @@ export function Navbar() {
               <span
                 className={`h-px w-4 bg-text transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
               />
-              <span className={`h-px w-4 bg-text transition ${open ? "opacity-0" : ""}`} />
+              <span
+                className={`h-px w-4 bg-text transition ${open ? "opacity-0" : ""}`}
+              />
               <span
                 className={`h-px w-4 bg-text transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
               />
@@ -93,39 +96,26 @@ export function Navbar() {
         </div>
       </header>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-bg/96 backdrop-blur-2xl lg:hidden"
-          >
-            <div className="flex h-full flex-col justify-between px-6 pb-10 pt-28">
-              <div className="space-y-1">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 * i }}
-                  >
-                    <Link
-                      href={link.href}
-                      className={`block rounded-2xl px-3 py-3 soft-title text-4xl ${
-                        pathname === link.href ? "text-red" : "text-text"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-              <p className="text-base text-muted">{site.email}</p>
+      {open ? (
+        <div className="fixed inset-0 z-40 animate-[fadeIn_0.25s_ease] bg-bg/96 backdrop-blur-2xl lg:hidden">
+          <div className="flex h-full flex-col justify-between px-6 pb-10 pt-28">
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block rounded-2xl px-3 py-3 soft-title text-4xl ${
+                    pathname === link.href ? "text-red" : "text-text"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <p className="text-base text-muted">{site.email}</p>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

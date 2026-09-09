@@ -1,32 +1,27 @@
 import dynamic from "next/dynamic";
-import { PhoneJourney } from "@/components/home/PhoneJourney";
 import { Marquee } from "@/components/home/Marquee";
+import { PhoneJourneyLazy } from "@/components/home/PhoneJourneyLazy";
 
 const StatsStrip = dynamic(
-  () => import("@/components/home/Sections").then((m) => m.StatsStrip),
-  { ssr: true }
+  () => import("@/components/home/Sections").then((m) => m.StatsStrip)
 );
 const ConversionSection = dynamic(
-  () => import("@/components/home/Sections").then((m) => m.ConversionSection),
-  { ssr: true }
+  () => import("@/components/home/Sections").then((m) => m.ConversionSection)
 );
 const ServicesPreview = dynamic(
-  () => import("@/components/home/Sections").then((m) => m.ServicesPreview),
-  { ssr: true }
+  () => import("@/components/home/Sections").then((m) => m.ServicesPreview)
 );
 const CasesPreview = dynamic(
-  () => import("@/components/home/Sections").then((m) => m.CasesPreview),
-  { ssr: true }
+  () => import("@/components/home/Sections").then((m) => m.CasesPreview)
 );
 const FinalCTA = dynamic(
-  () => import("@/components/home/Sections").then((m) => m.FinalCTA),
-  { ssr: true }
+  () => import("@/components/home/Sections").then((m) => m.FinalCTA)
 );
 
 export default function HomePage() {
   return (
     <>
-      <PhoneJourney />
+      <PhoneJourneyLazy />
       <Marquee
         items={[
           "App Development",
