@@ -48,7 +48,7 @@ export function CustomCursor() {
       className="pointer-events-none fixed left-0 top-0 z-[90] hidden h-5 w-5 mix-blend-difference md:block"
       style={{ display: "none", willChange: "transform" }}
     >
-      <span className="block h-full w-full rounded-full bg-red" />
+      <span className="block h-full w-full rounded-full bg-white" />
     </div>
   );
 }

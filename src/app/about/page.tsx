@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { team, stats, site } from "@/data/site";
+import Image from "next/image";
+import { cases, site, techStack } from "@/data/site";
 import {
   BigTitle,
   MagneticButton,
@@ -11,8 +12,7 @@ import {
 
 export const metadata: Metadata = {
   title: "About",
-  description:
-    "Appigon builds apps, landing pages, and store releases — then supports products for long-term market success.",
+  description: `About ${site.name} — product designer & developer helping people ship apps and websites end to end.`,
 };
 
 export default function AboutPage() {
@@ -20,87 +20,124 @@ export default function AboutPage() {
     <>
       <PageHero
         eyebrow="About"
-        title="A studio that ships"
-        description="Appigon is built for founders who need real product delivery: develop the app, launch pages, store release, and support after go-live."
+        title="Product, quietly obsessive"
+        description={site.pitch}
       />
 
       <section className="pb-16 md:pb-24">
         <Shell>
-          <div className="panel grid gap-10 p-8 md:grid-cols-2 md:gap-14 md:p-12">
-            <Reveal>
-              <SectionLabel>Who we are</SectionLabel>
-              <BigTitle>
-                Product people.
-                <br />
-                Release people.
-              </BigTitle>
+          <div className="apple-card grid items-center gap-10 p-8 md:grid-cols-12 md:gap-14 md:p-12">
+            <Reveal className="md:col-span-5">
+              <div className="relative mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/me/portrait.jpg"
+                  alt={site.name}
+                  fill
+                  className="object-cover object-[center_18%]"
+                  sizes="320px"
+                />
+              </div>
             </Reveal>
-            <Reveal delay={0.1}>
-              <div className="space-y-5 readable !text-[1.08rem]">
+            <Reveal delay={0.08} className="md:col-span-7">
+              <SectionLabel>Who I am</SectionLabel>
+              <BigTitle>
+                {site.shortName}
+                <span className="block font-serif italic font-normal text-muted">
+                  Dzhuran
+                </span>
+              </BigTitle>
+              <div className="mt-6 space-y-5 text-[16px] leading-relaxed text-[#6e6e73]">
                 <p>
-                  We don&apos;t stop at design files. Appigon develops mobile apps, builds
-                  the landings that convert, and takes products through App Store and
-                  Google Play into the market.
+                  Product designer & developer based across{" "}
+                  {site.locations.join(", ")}. I help people turn ideas into
+                  polished apps and websites — Figma, engineering, TestFlight,
+                  App Store, and the work after launch so users actually stay.
                 </p>
                 <p>
-                  After launch we stay close — updates, store optimization, fixes, and
-                  growth work so the product keeps winning.
+                  Right now that means Lifemaxxing (a location-anchored social
+                  network — “the IMDb of your life”), Big Red Map (cinematic
+                  travel map-as-profile), Anita (AI personal finance), and client
+                  brands like Mitkovt Coaching.
                 </p>
                 <p>
-                  Based across {site.locations.join(", ")}. Obsessed with launches that
-                  feel inevitable.
+                  The through-line is restraint: fewer elements, sharper
+                  decisions, and interfaces that feel expensive without needing
+                  to shout. If you need someone who will take care of your app or
+                  website like it’s theirs — that’s the work.
                 </p>
+              </div>
+              <div className="mt-8">
+                <MagneticButton href="/contact">Work with me</MagneticButton>
               </div>
             </Reveal>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-            {stats.map((s, i) => (
-              <Reveal
-                key={s.label}
-                delay={i * 0.06}
-                className="panel px-5 py-7 text-center"
-              >
-                <p className="soft-title text-4xl text-red md:text-5xl">{s.value}</p>
-                <p className="mt-3 text-[13px] font-medium text-muted">{s.label}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {cases.map((c) => (
+              <Reveal key={c.slug}>
+                <div className="apple-card h-full p-6 md:p-7">
+                  <p className="text-[12px] font-semibold tracking-wide text-[#86868b] uppercase">
+                    {c.category} · {c.year}
+                  </p>
+                  <h3 className="mt-2 text-[20px] font-semibold tracking-tight text-[#1d1d1f]">
+                    {c.title}
+                  </h3>
+                  <p className="mt-1 text-[14px] font-medium text-[#0071e3]">
+                    {c.tagline}
+                  </p>
+                  <p className="mt-3 text-[14px] leading-relaxed text-[#6e6e73]">
+                    {c.summary}
+                  </p>
+                </div>
               </Reveal>
             ))}
+          </div>
+
+          <div className="apple-card mt-5 p-7 md:p-9">
+            <SectionLabel>Stack</SectionLabel>
+            <p className="mt-3 max-w-xl text-[15px] text-[#6e6e73]">
+              Tools I use daily to go from idea to store without handing the
+              baton mid-flight.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {techStack.map((t) => (
+                <span
+                  key={t.name}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[#f5f5f7] px-3 py-2 text-[12px] font-semibold text-[#1d1d1f]"
+                >
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ background: t.tone }}
+                  />
+                  {t.name}
+                </span>
+              ))}
+            </div>
           </div>
         </Shell>
       </section>
 
-      <section className="pb-24 md:pb-32">
+      <section className="pb-28 md:pb-36">
         <Shell>
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <SectionLabel align="center">Core team</SectionLabel>
-            <BigTitle align="center">The unit</BigTitle>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {team.map((member, i) => (
-              <Reveal key={member.name} delay={i * 0.08}>
-                <article className="panel panel-hover h-full p-6">
-                  <div className="mb-6 flex h-40 items-end rounded-[20px] bg-[linear-gradient(160deg,#2a0808,#0a0a0c)] p-5">
-                    <span className="soft-title text-5xl text-red/45">
-                      {member.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </span>
-                  </div>
-                  <h3 className="soft-title text-2xl">{member.name}</h3>
-                  <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-red">
-                    {member.role}
-                  </p>
-                  <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                    {member.focus}
-                  </p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-          <div className="mt-12 flex justify-center">
-            <MagneticButton href="/contact">Work with us</MagneticButton>
-          </div>
+          <Reveal>
+            <div className="apple-card px-8 py-14 text-center md:px-16 md:py-20">
+              <SectionLabel align="center">Next</SectionLabel>
+              <h2 className="soft-title mx-auto max-w-2xl text-[clamp(2rem,5vw,3.4rem)]">
+                Building something worth
+                <span className="font-serif italic font-normal text-muted">
+                  {" "}
+                  shipping?
+                </span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-md text-[15px] text-[#6e6e73]">
+                Tell me about the product. I’ll tell you honestly whether I can
+                make it land.
+              </p>
+              <div className="mt-8 flex justify-center">
+                <MagneticButton href="/contact">Let’s talk</MagneticButton>
+              </div>
+            </div>
+          </Reveal>
         </Shell>
       </section>
     </>

@@ -38,7 +38,7 @@ export function MagneticButton({
     const rect = el.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    el.style.transform = `translate(${x * 0.22}px, ${y * 0.28}px)`;
+    el.style.transform = `translate(${x * 0.14}px, ${y * 0.18}px)`;
   };
 
   const onLeave = () => {
@@ -48,13 +48,13 @@ export function MagneticButton({
   };
 
   const base =
-    "group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-full px-7 py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] transition-transform duration-300 ease-out will-change-transform";
+    "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-[13px] font-medium tracking-[-0.01em] transition-transform duration-300 ease-out will-change-transform";
 
   const variants = {
-    primary: "bg-red text-white hover:bg-red-bright",
-    ghost: "bg-transparent text-text hover:text-red",
+    primary: "bg-[#1d1d1f] text-white hover:bg-black",
+    ghost: "bg-transparent text-text hover:text-accent",
     outline:
-      "border border-line bg-transparent text-text hover:border-red/60 hover:text-red",
+      "border border-line bg-white text-text hover:border-black/20 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)]",
   };
 
   const content = (
@@ -62,7 +62,7 @@ export function MagneticButton({
       <span className="relative z-10">{children}</span>
       <span
         aria-hidden
-        className="relative z-10 inline-block transition-transform duration-300 group-hover:translate-x-1"
+        className="relative z-10 inline-block transition-transform duration-300 group-hover:translate-x-0.5"
       >
         →
       </span>
@@ -107,7 +107,7 @@ export function SectionLabel({
 }) {
   return (
     <div
-      className={`eyebrow mb-5 ${align === "center" ? "justify-center before:hidden" : ""}`}
+      className={`eyebrow mb-4 ${align === "center" ? "justify-center before:hidden" : ""}`}
     >
       {children}
     </div>
@@ -125,7 +125,7 @@ export function BigTitle({
 }) {
   return (
     <h2
-      className={`soft-title text-[clamp(2.4rem,6.5vw,5.4rem)] ${
+      className={`soft-title text-[clamp(2.2rem,5.5vw,4.2rem)] ${
         align === "center" ? "text-center" : ""
       } ${className}`}
     >

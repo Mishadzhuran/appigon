@@ -1,83 +1,82 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { MagneticButton, Shell } from "@/components/ui/Primitives";
-
-const HeroScene = dynamic(
-  () => import("@/components/three/HeroScene").then((m) => m.HeroScene),
-  { ssr: false }
-);
+import Link from "next/link";
+import { site } from "@/data/site";
+import { PremiumPhone } from "./PremiumPhone";
+import { ToolIcons } from "./ToolIcons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100svh] overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(239,26,18,0.22),transparent_58%)]" />
+    <section className="relative overflow-x-clip pb-14 pt-28 md:pb-20 md:pt-32">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(10,132,255,0.12), transparent 60%)",
+        }}
+      />
 
-      <div className="pointer-events-none absolute inset-x-0 top-[8%] mx-auto h-[48vh] max-w-5xl opacity-70 md:h-[54vh]">
-        <HeroScene />
-      </div>
-
-      <Shell className="relative z-10 flex min-h-[100svh] flex-col items-center justify-end pb-16 pt-40 text-center md:pb-20 md:pt-44">
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
+      <div className="relative mx-auto max-w-[1100px] px-5 md:px-8">
+        <motion.div
+          className="mx-auto max-w-xl text-center"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, ease }}
-          className="eyebrow mb-6 justify-center before:hidden"
+          transition={{ duration: 0.65, ease }}
         >
-          App development · Store release · Ongoing support
-        </motion.p>
+          <h1 className="text-[clamp(2.2rem,5vw,3.6rem)] font-semibold leading-[1.08] tracking-[-0.045em] text-[#1d1d1f]">
+            I help people build
+            <br />
+            products that feel easy.
+          </h1>
+          <p className="mx-auto mt-4 max-w-md text-[16px] leading-relaxed text-[#6e6e73]">
+            Apps and websites — from idea to launch.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/contact"
+              className="rounded-full bg-[#0071e3] px-7 py-3.5 text-[15px] font-semibold !text-white transition hover:bg-[#0077ed]"
+            >
+              Start a project
+            </Link>
+            <Link
+              href="/#work"
+              className="rounded-full bg-black/[0.05] px-7 py-3.5 text-[15px] font-semibold text-[#1d1d1f] transition hover:bg-black/[0.08]"
+            >
+              See work
+            </Link>
+          </div>
+        </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 42, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, ease }}
-          className="soft-title max-w-5xl text-[clamp(3.2rem,10vw,7.4rem)]"
-        >
-          <span className="block text-red">Appigon</span>
-          <span className="block text-text">ships apps</span>
-          <span className="block text-text/55">to market</span>
-        </motion.h1>
-
-        <motion.p
+        <motion.div
+          className="relative mt-16 overflow-visible md:mt-20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28, duration: 0.75, ease }}
-          className="readable mx-auto mt-8 max-w-2xl"
+          transition={{ duration: 0.7, delay: 0.08, ease }}
         >
-          We develop mobile apps, build conversion landing pages, handle App Store &
-          Google Play release, and keep supporting the product after launch.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.42, duration: 0.7, ease }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-3"
-        >
-          <MagneticButton href="/contact">Start a project</MagneticButton>
-          <MagneticButton href="/cases" variant="outline">
-            View cases
-          </MagneticButton>
+          <div className="relative mx-4 md:mx-8">
+            <div className="relative overflow-visible rounded-[36px] bg-white/75 shadow-[0_24px_70px_rgba(0,0,0,0.07)] ring-1 ring-black/[0.04] backdrop-blur-xl md:rounded-[40px]">
+              <ToolIcons />
+              <div className="relative z-10 flex justify-center px-8 py-16 md:px-16 md:py-20">
+                <div className="relative">
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-2 left-1/2 h-10 w-[70%] -translate-x-1/2 rounded-full bg-black/15 blur-2xl"
+                  />
+                  <PremiumPhone />
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="mt-14 flex items-center gap-3 text-[12px] font-medium uppercase tracking-[0.18em] text-muted-soft"
-        >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-red/60" />
-            <span className="relative h-2.5 w-2.5 rounded-full bg-red" />
-          </span>
-          Scroll — unlock the full journey
-        </motion.div>
-      </Shell>
-
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-bg via-bg/80 to-transparent" />
+        <p className="mt-10 text-center text-[13px] text-[#86868b]">
+          {site.name} · {site.locations[0]}
+        </p>
+      </div>
     </section>
   );
 }

@@ -1,0 +1,182 @@
+"use client";
+
+import Image from "next/image";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { cases } from "@/data/site";
+import { Shell } from "@/components/ui/Primitives";
+
+const ease = [0.16, 1, 0.3, 1] as const;
+type CaseItem = (typeof cases)[number];
+
+function CaseRow({
+  item,
+  index,
+  onOpen,
+}: {
+  item: CaseItem;
+  index: number;
+  onOpen: (c: CaseItem) => void;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.9", "start 0.4"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [56, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const flip = index % 2 === 1;
+
+  return (
+    <motion.article
+      ref={ref}
+      style={{ y, opacity }}
+      className="overflow-hidden rounded-[32px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.06)]"
+    >
+      <div
+        className={`grid lg:grid-cols-2 ${flip ? "lg:[&>*:first-child]:order-2" : ""}`}
+      >
+        <button
+          type="button"
+          onClick={() => onOpen(item)}
+          className="relative min-h-[280px] overflow-hidden bg-[#f5f5f7] text-left lg:min-h-[380px]"
+        >
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            className="object-cover transition duration-700 hover:scale-[1.03]"
+            sizes="(max-width:1024px) 100vw, 50vw"
+          />
+        </button>
+        <div className="flex flex-col justify-center px-8 py-10 md:px-12">
+          <p className="text-[12px] font-semibold tracking-[0.14em] text-[#86868b] uppercase">
+            {item.category}
+          </p>
+          <h3 className="mt-3 text-[28px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[34px]">
+            {item.title}
+          </h3>
+          <p className="mt-2 text-[15px] font-medium text-[#0071e3]">
+            {item.tagline}
+          </p>
+          <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-[#6e6e73]">
+            {item.summary}
+          </p>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+export function WorkSection() {
+  const [active, setActive] = useState<CaseItem | null>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: headRef,
+    offset: ["start 0.9", "start 0.5"],
+  });
+  const headY = useTransform(scrollYProgress, [0, 1], [32, 0]);
+  const headOp = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActive(null);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [active]);
+
+  return (
+    <section id="work" className="scroll-mt-28 py-16 md:py-24">
+      <Shell>
+        <motion.div
+          ref={headRef}
+          style={{ y: headY, opacity: headOp }}
+          className="mx-auto max-w-xl text-center"
+        >
+          <p className="text-[12px] font-semibold tracking-[0.16em] text-[#86868b] uppercase">
+            Selected work
+          </p>
+          <h2 className="mt-3 text-[clamp(2rem,4vw,3rem)] font-semibold tracking-[-0.04em] text-[#1d1d1f]">
+            Things I’ve shipped
+          </h2>
+        </motion.div>
+
+        <div className="mt-12 space-y-8 md:mt-14 md:space-y-10">
+          {cases.map((item, i) => (
+            <CaseRow
+              key={item.slug}
+              item={item}
+              index={i}
+              onOpen={setActive}
+            />
+          ))}
+        </div>
+      </Shell>
+
+      <AnimatePresence>
+        {active && (
+          <motion.div
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActive(null)}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.35, ease }}
+              className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[28px] bg-white p-5 shadow-2xl md:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[12px] font-semibold tracking-wide text-[#86868b] uppercase">
+                    {active.category}
+                  </p>
+                  <h3 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">
+                    {active.title}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActive(null)}
+                  className="rounded-full bg-black/5 px-3 py-1.5 text-[13px] font-semibold text-[#1d1d1f] hover:bg-black/10"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {(active.gallery.length ? active.gallery : [active.image]).map(
+                  (src) => (
+                    <div
+                      key={src}
+                      className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#f5f5f7]"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${active.title} screen`}
+                        fill
+                        className="object-cover object-top"
+                        sizes="(max-width:640px) 100vw, 50vw"
+                      />
+                    </div>
+                  ),
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}

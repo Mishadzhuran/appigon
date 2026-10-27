@@ -8,18 +8,18 @@ import {
 } from "@/components/ui/Primitives";
 
 export const metadata: Metadata = {
-  title: "Cases",
+  title: "Work",
   description:
-    "Selected Appigon work — fintech, social, health, logistics, and B2B products shipped end to end.",
+    "Selected work by Misha Dzhuran — fintech, social, health, logistics, and B2B products shipped end to end.",
 };
 
 export default function CasesPage() {
   return (
     <>
       <PageHero
-        eyebrow="Cases"
+        eyebrow="Work"
         title="Proof over promises"
-        description="Real products. Real metrics. From first wireframe to growth loops that actually compound."
+        description="Real products. Real metrics. From first frame to growth loops that actually compound."
       />
 
       <section className="pb-24 md:pb-32">

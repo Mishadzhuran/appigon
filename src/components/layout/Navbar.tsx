@@ -8,14 +8,6 @@ import { navLinks, site } from "@/data/site";
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setOpen(false);
@@ -28,38 +20,34 @@ export function Navbar() {
     };
   }, [open]);
 
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href.startsWith("/#")) return pathname === "/";
+    return pathname === href;
+  };
+
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-6 md:pt-5">
-        <div
-          className={`shell-wide flex items-center justify-between rounded-full border px-4 py-3 transition-all duration-300 md:px-5 ${
-            scrolled || open
-              ? "border-line bg-bg/85 backdrop-blur-xl"
-              : "border-white/10 bg-bg/40 backdrop-blur-md"
-          }`}
-        >
-          <Link href="/" className="group flex items-center gap-3">
-            <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-red">
-              <span className="relative z-10 font-display text-lg leading-none text-white">
-                A
-              </span>
-            </span>
-            <span className="soft-title text-xl tracking-[0.02em]">
-              {site.name}
-            </span>
+      <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
+        <div className="flex w-full max-w-[720px] items-center justify-between gap-2 rounded-full border border-black/8 bg-white/75 px-2 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.06)] backdrop-blur-2xl md:px-2.5">
+          <Link
+            href="/"
+            className="rounded-full px-4 py-2 font-display text-[15px] font-bold tracking-[-0.04em] text-text"
+          >
+            {site.shortName}
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {navLinks.map((link) => {
-              const active = pathname === link.href;
+          <nav className="hidden items-center gap-0.5 sm:flex">
+            {[{ href: "/", label: "Home" }, ...navLinks].map((link) => {
+              const active = isActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-full px-3.5 py-2 text-[12px] font-medium tracking-[0.04em] transition-colors ${
+                  className={`rounded-full px-3.5 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors ${
                     active
-                      ? "bg-red/15 text-red"
-                      : "text-muted hover:bg-white/5 hover:text-text"
+                      ? "bg-black/[0.06] text-text"
+                      : "text-muted hover:text-text"
                   }`}
                 >
                   {link.label}
@@ -68,28 +56,28 @@ export function Navbar() {
             })}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
             <Link
               href="/contact"
-              className="hidden rounded-full bg-red px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-red-bright md:inline-flex"
+              className="hidden rounded-full bg-[#1d1d1f] px-4 py-2 text-[13px] font-medium !text-white transition hover:bg-black sm:inline-flex"
             >
-              Start project
+              Contact
             </Link>
             <button
               type="button"
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className="relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full border border-white/15 lg:hidden"
+              className="relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full sm:hidden"
             >
               <span
-                className={`h-px w-4 bg-text transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
+                className={`h-px w-4 bg-text transition duration-300 ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
               />
               <span
-                className={`h-px w-4 bg-text transition ${open ? "opacity-0" : ""}`}
+                className={`h-px w-4 bg-text transition duration-300 ${open ? "opacity-0" : ""}`}
               />
               <span
-                className={`h-px w-4 bg-text transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
+                className={`h-px w-4 bg-text transition duration-300 ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
               />
             </button>
           </div>
@@ -97,15 +85,15 @@ export function Navbar() {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-40 animate-[fadeIn_0.25s_ease] bg-bg/96 backdrop-blur-2xl lg:hidden">
+        <div className="fixed inset-0 z-40 animate-[fadeIn_0.3s_ease] bg-[#f5f5f7]/95 backdrop-blur-xl sm:hidden">
           <div className="flex h-full flex-col justify-between px-6 pb-10 pt-28">
             <div className="space-y-1">
-              {navLinks.map((link) => (
+              {[{ href: "/", label: "Home" }, ...navLinks].map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block rounded-2xl px-3 py-3 soft-title text-4xl ${
-                    pathname === link.href ? "text-red" : "text-text"
+                  className={`block py-3 font-display text-4xl font-bold tracking-[-0.04em] ${
+                    isActive(link.href) ? "text-text" : "text-muted"
                   }`}
                 >
                   {link.label}
