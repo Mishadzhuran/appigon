@@ -1,9 +1,17 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+  animate,
+} from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const spring = { type: "spring" as const, stiffness: 400, damping: 28 };
+const soft = { type: "spring" as const, stiffness: 280, damping: 24 };
 
 const FLOW = [
   { id: "talk", label: "Talk", title: "Talk" },
@@ -26,49 +34,62 @@ function Glass({
 
 function ScreenTalk() {
   return (
-    <div className="flex h-full flex-col gap-2">
+    <div className="flex h-full flex-col gap-2.5">
       <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+        initial={{ opacity: 0, y: 14, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.05, duration: 0.4, ease }}
-        className="ml-auto max-w-[84%] rounded-[16px] rounded-br-[4px] bg-[#0071e3] px-3 py-2 shadow-[0_8px_18px_rgba(0,113,227,0.28)]"
+        transition={{ delay: 0.15, ...soft }}
+        className="ml-auto max-w-[86%] rounded-[18px] rounded-br-[5px] bg-[#0071e3] px-3.5 py-2.5 shadow-[0_8px_20px_rgba(0,113,227,0.25)]"
       >
         <p className="text-[12px] leading-snug !text-white">
-          I want to build an app.
+          We want to ship a product this quarter.
         </p>
       </motion.div>
+
       <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+        initial={{ opacity: 0, y: 14, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.18, duration: 0.4, ease }}
+        transition={{ delay: 0.75, ...soft }}
       >
-        <Glass className="max-w-[86%] rounded-bl-[4px] px-3 py-2">
+        <Glass className="max-w-[90%] rounded-bl-[5px] px-3.5 py-2.5">
           <p className="text-[12px] leading-snug text-[#1d1d1f]">
-            What’s the first win?
+            What’s the one outcome that has to work?
           </p>
         </Glass>
       </motion.div>
+
       <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+        initial={{ opacity: 0, y: 14, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.3, duration: 0.4, ease }}
-        className="ml-auto max-w-[84%] rounded-[16px] rounded-br-[4px] bg-[#0071e3] px-3 py-2 shadow-[0_8px_18px_rgba(0,113,227,0.28)]"
+        transition={{ delay: 1.35, ...soft }}
+        className="ml-auto max-w-[86%] rounded-[18px] rounded-br-[5px] bg-[#0071e3] px-3.5 py-2.5 shadow-[0_8px_20px_rgba(0,113,227,0.25)]"
       >
-        <p className="text-[12px] leading-snug !text-white">MVP in 6 weeks.</p>
+        <p className="text-[12px] leading-snug !text-white">
+          A usable MVP in six weeks.
+        </p>
       </motion.div>
+
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.42, duration: 0.4, ease }}
+        transition={{ delay: 1.95, ...soft }}
         className="mt-auto"
       >
-        <Glass className="flex items-center justify-between px-3 py-2.5">
-          <span className="text-[12px] font-semibold text-[#1d1d1f]">
-            Intro call
-          </span>
-          <span className="rounded-full bg-[#0071e3]/12 px-2 py-0.5 text-[10px] font-semibold text-[#0071e3]">
-            20 min
-          </span>
+        <Glass className="flex items-center justify-between px-3.5 py-2.5">
+          <div>
+            <p className="text-[12px] font-semibold text-[#1d1d1f]">
+              Discovery call
+            </p>
+            <p className="text-[10px] text-[#6e6e73]">30 min · Meet</p>
+          </div>
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.15, ...spring }}
+            className="rounded-full bg-[#34c759]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#248a3d]"
+          >
+            Booked
+          </motion.span>
         </Glass>
       </motion.div>
     </div>
@@ -77,99 +98,151 @@ function ScreenTalk() {
 
 function ScreenAgree() {
   const rows = [
-    { k: "Scope", v: "MVP" },
-    { k: "Time", v: "6 weeks" },
-    { k: "Price", v: "Fixed" },
+    { k: "Scope", v: "Product MVP" },
+    { k: "Timeline", v: "6 weeks" },
+    { k: "Investment", v: "Fixed fee" },
   ];
   return (
-    <div className="flex flex-col gap-2">
-      <Glass className="overflow-hidden">
-        {rows.map((row, i) => (
-          <motion.div
-            key={row.k}
-            initial={{ opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.06 + i * 0.07, duration: 0.35, ease }}
-            className={`flex items-center justify-between px-3 py-2.5 ${
-              i < rows.length - 1 ? "border-b border-black/[0.05]" : ""
-            }`}
-          >
-            <span className="text-[12px] text-[#6e6e73]">{row.k}</span>
-            <span className="text-[13px] font-semibold text-[#1d1d1f]">
-              {row.v}
-            </span>
-          </motion.div>
-        ))}
-      </Glass>
+    <div className="flex flex-col gap-2.5">
       <motion.div
-        initial={{ opacity: 0, scale: 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.32, type: "spring", stiffness: 280, damping: 18 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease }}
       >
-        <Glass className="flex items-center gap-2 px-3 py-2.5">
+        <Glass className="overflow-hidden">
+          <div className="border-b border-black/[0.05] px-3.5 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#86868b]">
+              Proposal
+            </p>
+          </div>
+          {rows.map((row, i) => (
+            <motion.div
+              key={row.k}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.14 + i * 0.08, duration: 0.38, ease }}
+              className={`flex items-center justify-between px-3.5 py-2.5 ${
+                i < rows.length - 1 ? "border-b border-black/[0.05]" : ""
+              }`}
+            >
+              <span className="text-[12px] text-[#6e6e73]">{row.k}</span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.28 + i * 0.08, duration: 0.3 }}
+                className="text-[13px] font-semibold text-[#1d1d1f]"
+              >
+                {row.v}
+              </motion.span>
+            </motion.div>
+          ))}
+        </Glass>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.48, ...spring }}
+      >
+        <Glass className="flex items-center gap-2.5 px-3.5 py-2.5">
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{
-              delay: 0.45,
-              type: "spring",
-              stiffness: 420,
-              damping: 15,
-            }}
+            transition={{ delay: 0.6, ...spring }}
             className="flex h-5 w-5 items-center justify-center rounded-full bg-[#34c759] text-[10px] font-bold !text-white"
           >
             ✓
           </motion.span>
-          <p className="text-[12px] font-semibold text-[#1d1d1f]">Confirmed</p>
+          <p className="text-[12px] font-semibold text-[#1d1d1f]">
+            Proposal signed
+          </p>
         </Glass>
       </motion.div>
     </div>
   );
 }
 
+function CountUp({ to, delay = 0 }: { to: number; delay?: number }) {
+  const mv = useMotionValue(0);
+  const rounded = useTransform(mv, (v) => `${Math.round(v)}%`);
+  const [text, setText] = useState("0%");
+
+  useEffect(() => {
+    const unsub = rounded.on("change", (v) => setText(v));
+    const controls = animate(mv, to, {
+      duration: 1.05,
+      delay,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    return () => {
+      unsub();
+      controls.stop();
+    };
+  }, [to, delay, mv, rounded]);
+
+  return <span>{text}</span>;
+}
+
 function ScreenBuild() {
   const items = [
-    { t: "Design", s: "Done", c: "text-[#34c759]" },
-    { t: "iOS & web", s: "Live", c: "text-[#0071e3]" },
-    { t: "TestFlight", s: "Next", c: "text-[#86868b]" },
-    { t: "Store", s: "Queued", c: "text-[#86868b]" },
+    { t: "Design system", s: "Done", c: "text-[#34c759]", on: false },
+    { t: "Core product", s: "Building", c: "text-[#0071e3]", on: true },
+    { t: "TestFlight", s: "This week", c: "text-[#86868b]", on: false },
+    { t: "Store release", s: "Queued", c: "text-[#86868b]", on: false },
   ];
   return (
-    <div className="flex h-full flex-col gap-2">
-      <Glass className="px-3 py-3">
-        <div className="flex items-end justify-between">
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-[28px] font-semibold tracking-[-0.05em] text-[#1d1d1f]"
-          >
-            72%
-          </motion.p>
-          <p className="pb-0.5 text-[11px] font-semibold text-[#0071e3]">
-            Week 4
-          </p>
-        </div>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/[0.06]">
-          <motion.div
-            className="h-full rounded-full bg-[#0071e3]"
-            initial={{ width: 0 }}
-            animate={{ width: "72%" }}
-            transition={{ duration: 0.9, ease }}
-          />
-        </div>
-      </Glass>
+    <div className="flex h-full flex-col gap-2.5">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease }}
+      >
+        <Glass className="px-3.5 py-3">
+          <div className="flex items-end justify-between">
+            <p className="text-[28px] font-semibold tracking-[-0.05em] text-[#1d1d1f]">
+              <CountUp to={72} delay={0.12} />
+            </p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.3 }}
+              className="pb-0.5 text-[11px] font-semibold text-[#0071e3]"
+            >
+              Week 4 of 6
+            </motion.p>
+          </div>
+          <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-black/[0.06]">
+            <motion.div
+              className="h-full rounded-full bg-[#0071e3]"
+              initial={{ width: 0 }}
+              animate={{ width: "72%" }}
+              transition={{ delay: 0.18, duration: 1, ease }}
+            />
+          </div>
+        </Glass>
+      </motion.div>
+
       <Glass className="overflow-hidden">
         {items.map((item, i) => (
           <motion.div
             key={item.t}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.06, duration: 0.32, ease }}
-            className={`flex items-center justify-between px-3 py-2.5 ${
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 + i * 0.07, duration: 0.35, ease }}
+            className={`flex items-center gap-2 px-3.5 py-2.5 ${
               i < items.length - 1 ? "border-b border-black/[0.05]" : ""
             }`}
           >
-            <span className="text-[12px] text-[#1d1d1f]">{item.t}</span>
+            <span
+              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                item.s === "Done"
+                  ? "bg-[#34c759]"
+                  : item.on
+                    ? "bg-[#0071e3]"
+                    : "bg-[#d2d2d7]"
+              }`}
+            />
+            <span className="flex-1 text-[12px] text-[#1d1d1f]">{item.t}</span>
             <span className={`text-[11px] font-semibold ${item.c}`}>
               {item.s}
             </span>
@@ -182,78 +255,99 @@ function ScreenBuild() {
 
 function ScreenLaunch() {
   const checks = [
-    { t: "Privacy labels", d: 0.18 },
-    { t: "Screenshots", d: 0.28 },
-    { t: "Review notes", d: 0.38 },
-    { t: "Soft launch", d: 0.48 },
+    "App Store listing",
+    "Privacy labels",
+    "Review notes",
+    "Version 1.0 live",
   ];
   return (
-    <div className="flex h-full flex-col gap-2">
-      <Glass className="px-3 py-3.5 text-center">
-        <motion.div
-          initial={{ scale: 0.7, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 16 }}
-          className="relative mx-auto w-fit"
-        >
-          <motion.span
-            aria-hidden
-            animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-[-8px] rounded-[18px] bg-[#0071e3]/30"
-          />
-          <div className="relative flex h-11 w-11 items-center justify-center rounded-[13px] bg-[#0071e3] shadow-[0_10px_24px_rgba(0,113,227,0.4)]">
-            <motion.svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              animate={{ rotate: [0, -8, 8, 0] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+    <div className="flex h-full flex-col gap-2.5">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...soft }}
+      >
+        <Glass className="px-3.5 py-3">
+          <div className="flex items-center gap-2.5">
+            <motion.div
+              initial={{ scale: 0.75, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={spring}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] bg-[#0071e3] shadow-[0_10px_22px_rgba(0,113,227,0.28)]"
             >
-              <path
-                d="M12 3l1.8 5.5H19l-4.4 3.2 1.7 5.3L12 13.8 7.7 17l1.7-5.3L5 8.5h5.2L12 3z"
-                fill="white"
-              />
-            </motion.svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 3l1.8 5.5H19l-4.4 3.2 1.7 5.3L12 13.8 7.7 17l1.7-5.3L5 8.5h5.2L12 3z"
+                  fill="white"
+                />
+              </svg>
+            </motion.div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-semibold text-[#1d1d1f]">
+                Client Product
+              </p>
+              <p className="text-[10px] text-[#6e6e73]">Productivity</p>
+              <div className="mt-1 flex items-center gap-0.5">
+                {[0, 1, 2, 3, 4].map((s) => (
+                  <motion.svg
+                    key={s}
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    initial={{ opacity: 0, scale: 0.4 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 + s * 0.05, ...spring }}
+                  >
+                    <path
+                      d="M12 3l1.8 5.5H19l-4.4 3.2 1.7 5.3L12 13.8 7.7 17l1.7-5.3L5 8.5h5.2L12 3z"
+                      fill="#0071e3"
+                    />
+                  </motion.svg>
+                ))}
+              </div>
+            </div>
+            <motion.span
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.28, ...spring }}
+              className="shrink-0 rounded-full bg-[#0071e3] px-3 py-1.5 text-[10px] font-bold !text-white shadow-[0_6px_14px_rgba(0,113,227,0.25)]"
+            >
+              GET
+            </motion.span>
           </div>
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.35, ease }}
-          className="mt-2.5 text-[14px] font-semibold tracking-[-0.02em] text-[#1d1d1f]"
-        >
-          App Store ready
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.25, duration: 0.35 }}
-          className="mt-0.5 text-[10px] font-medium text-[#0071e3]"
-        >
-          Submitted for review
-        </motion.p>
-      </Glass>
-      <div className="space-y-1.5">
-        {checks.map((c) => (
+
           <motion.div
-            key={c.t}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: c.d, duration: 0.35, ease }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.35, ease }}
+            className="mt-3 flex items-center gap-1.5 rounded-[12px] bg-black/[0.04] px-2.5 py-2"
           >
-            <Glass className="flex items-center justify-between px-3 py-2">
-              <span className="text-[11px] text-[#1d1d1f]">{c.t}</span>
+            <motion.span
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="h-1.5 w-1.5 rounded-full bg-[#34c759]"
+            />
+            <span className="text-[10px] font-semibold text-[#1d1d1f]">
+              Live on the App Store
+            </span>
+          </motion.div>
+        </Glass>
+      </motion.div>
+
+      <div className="space-y-1.5">
+        {checks.map((t, i) => (
+          <motion.div
+            key={t}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 + i * 0.08, ...soft }}
+          >
+            <Glass className="flex items-center justify-between px-3.5 py-2">
+              <span className="text-[11px] text-[#1d1d1f]">{t}</span>
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{
-                  delay: c.d + 0.12,
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 14,
-                }}
+                transition={{ delay: 0.42 + i * 0.08, ...spring }}
                 className="flex h-4 w-4 items-center justify-center rounded-full bg-[#34c759] text-[8px] font-bold !text-white"
               >
                 ✓
@@ -291,6 +385,77 @@ const TAB_ICONS = [
   />,
 ];
 
+function DynamicIsland({ live }: { live: boolean }) {
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 z-[25]">
+        <div
+          className="absolute left-1/2 -translate-x-1/2 bg-[#f5f5f7]"
+          style={{
+            top: "1.7%",
+            height: "1.55%",
+            width: "52%",
+            borderRadius: 999,
+          }}
+        />
+      </div>
+      <div
+        className={`pointer-events-none absolute inset-0 ${
+          live ? "z-[35]" : "z-[25]"
+        }`}
+      >
+        <div
+          className="absolute left-1/2 flex -translate-x-1/2 justify-center"
+          style={{ top: "3.2%" }}
+        >
+          <motion.div
+            animate={{ width: live ? 114 : 78 }}
+            transition={spring}
+            className="relative flex h-[22px] items-center overflow-hidden rounded-full bg-black"
+          >
+            <AnimatePresence initial={false} mode="wait">
+              {live ? (
+                <motion.div
+                  key="live"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="flex w-full items-center gap-1.5 px-2.5"
+                >
+                  <motion.span
+                    animate={{ opacity: [1, 0.4, 1] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34c759]"
+                  />
+                  <span className="text-[7px] font-semibold tracking-wide !text-white/90">
+                    Live
+                  </span>
+                  <span className="ml-auto h-[10px] w-[10px] shrink-0 rounded-full bg-[#1a283c]" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="relative h-full w-full"
+                >
+                  <span className="absolute right-[5px] top-1/2 h-[10px] w-[10px] -translate-y-1/2 rounded-full bg-[#1a283c]" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function PremiumPhone({ className = "" }: { className?: string }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -301,7 +466,7 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
     if (paused) return;
     const id = window.setInterval(
       () => setI((n) => (n + 1) % FLOW.length),
-      4200,
+      5200,
     );
     return () => window.clearInterval(id);
   }, [paused]);
@@ -322,100 +487,103 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
             "drop-shadow(0 28px 50px rgba(0,0,0,0.18)) drop-shadow(0 8px 16px rgba(0,0,0,0.08))",
         }}
       >
-        {/* Screen sits in pre-cut transparent hole of iphone-device.png */}
         <div
-          className="absolute z-0 overflow-hidden"
-          style={{
-            left: "4.4%",
-            right: "4.2%",
-            top: "1.6%",
-            bottom: "1.6%",
-            borderRadius: "44px",
-            background:
-              "linear-gradient(165deg, #e8eef8 0%, #f5f5f7 40%, #eef2f8 100%)",
-          }}
+          className="absolute inset-0 overflow-hidden"
+          style={{ borderRadius: 48 }}
         >
-          <div className="absolute inset-0 flex flex-col">
-            <div className="flex min-h-0 flex-1 flex-col px-3 pt-10 pb-[4.5rem]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.32, ease }}
-                  className="flex min-h-0 flex-1 flex-col"
-                >
-                  <h3 className="text-[20px] font-semibold tracking-[-0.045em] text-[#1d1d1f]">
-                    {step.title}
-                  </h3>
-                  <div className="mt-2.5 min-h-0 flex-1">
-                    <Body />
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-2 pb-1">
-              <div className="liquid-glass pointer-events-auto relative flex items-center justify-between overflow-hidden rounded-full px-0.5 py-1">
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-90"
-                />
-                {FLOW.map((f, idx) => {
-                  const on = idx === i;
-                  return (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => go(idx)}
-                      className="relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-0.5 py-1"
+          <div
+            className="absolute z-0 overflow-hidden bg-[#f5f5f7]"
+            style={{
+              left: "5.2%",
+              right: "5.2%",
+              top: "1.55%",
+              bottom: "1.9%",
+              borderRadius: 40,
+            }}
+          >
+            <div className="absolute inset-0 flex flex-col">
+              <div className="flex min-h-0 flex-1 flex-col px-3 pt-10 pb-[4.5rem]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={step.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.34, ease }}
+                    className="flex min-h-0 flex-1 flex-col"
+                  >
+                    <motion.h3
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease }}
+                      className="text-[20px] font-semibold tracking-[-0.045em] text-[#1d1d1f]"
                     >
-                      {on && (
-                        <motion.span
-                          layoutId="phone-tab-glow"
-                          className="absolute inset-0 rounded-full bg-white/75 shadow-[0_3px_12px_rgba(0,0,0,0.06)]"
-                          transition={{
-                            type: "spring",
-                            stiffness: 400,
-                            damping: 32,
-                          }}
-                        />
-                      )}
-                      <span
-                        className={`relative z-10 ${
-                          on ? "text-[#0071e3]" : "text-[#8e8e93]"
-                        }`}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24">
-                          {TAB_ICONS[idx]}
-                        </svg>
-                      </span>
-                      <span
-                        className={`relative z-10 text-[8px] font-semibold ${
-                          on ? "text-[#0071e3]" : "text-[#8e8e93]"
-                        }`}
-                      >
-                        {f.label}
-                      </span>
-                    </button>
-                  );
-                })}
+                      {step.title}
+                    </motion.h3>
+                    <div className="mt-2.5 min-h-0 flex-1">
+                      <Body />
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <div className="mt-1 flex justify-center">
-                <span className="h-[3px] w-[32%] rounded-full bg-[#1d1d1f]/9" />
+
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-2 pb-1">
+                <div className="liquid-glass pointer-events-auto relative flex items-center justify-between overflow-hidden rounded-full px-0.5 py-1">
+                  {FLOW.map((f, idx) => {
+                    const on = idx === i;
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => go(idx)}
+                        className="relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-0.5 py-1"
+                      >
+                        {on && (
+                          <motion.span
+                            layoutId="phone-tab-glow"
+                            className="absolute inset-0 rounded-full bg-white/80 shadow-[0_3px_12px_rgba(0,0,0,0.06)]"
+                            transition={spring}
+                          />
+                        )}
+                        <motion.span
+                          animate={{ scale: on ? 1.08 : 1 }}
+                          transition={soft}
+                          className={`relative z-10 ${
+                            on ? "text-[#0071e3]" : "text-[#8e8e93]"
+                          }`}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24">
+                            {TAB_ICONS[idx]}
+                          </svg>
+                        </motion.span>
+                        <span
+                          className={`relative z-10 text-[8px] font-semibold ${
+                            on ? "text-[#0071e3]" : "text-[#8e8e93]"
+                          }`}
+                        >
+                          {f.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-1 flex justify-center">
+                  <span className="h-[3px] w-[32%] rounded-full bg-[#1d1d1f]/9" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/devices/iphone-device.png?v=wmf1"
-          alt=""
-          className="pointer-events-none absolute inset-0 z-30 h-full w-full select-none"
-          draggable={false}
-        />
+          <DynamicIsland live={step.id === "launch"} />
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/devices/iphone-device.png?v=island3"
+            alt=""
+            className="pointer-events-none absolute inset-0 z-30 h-full w-full select-none"
+            draggable={false}
+          />
+        </div>
       </div>
     </div>
   );

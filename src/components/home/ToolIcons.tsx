@@ -155,8 +155,8 @@ const tools: Tool[] = [
   {
     name: "Kotlin",
     src: "/icons/kotlin.svg",
-    x: "42%",
-    y: "12%",
+    x: "18%",
+    y: "58%",
     size: 42,
     delay: 0.11,
     layer: "back",

@@ -149,16 +149,24 @@ function UsersCard() {
 function ReleaseCard() {
   const items = ["Privacy labels", "Screenshots", "Review notes"];
   return (
-    <CardShell delay={0.1}>
-      <div className="flex items-start justify-between gap-3">
+    <CardShell delay={0.1} className="relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-[#0071e3]/12 blur-3xl"
+      />
+      <div className="relative flex items-start justify-between gap-3">
         <p className="text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-          Store-ready
+          App Store
         </p>
-        <span className="rounded-full bg-[#0071e3] px-3 py-1.5 text-[12px] font-semibold !text-white">
-          Live
-        </span>
+        <motion.span
+          animate={{ scale: [1, 1.04, 1] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          className="rounded-full bg-[#0071e3] px-3 py-1.5 text-[12px] font-semibold !text-white shadow-[0_8px_20px_rgba(0,113,227,0.3)]"
+        >
+          Ready
+        </motion.span>
       </div>
-      <div className="mt-4 space-y-2.5">
+      <div className="relative mt-4 space-y-2.5">
         {items.map((t, i) => (
           <motion.div
             key={t}
@@ -169,12 +177,25 @@ function ReleaseCard() {
             className="flex items-center justify-between"
           >
             <p className="text-[14px] text-[#1d1d1f]">{t}</p>
-            <p className="text-[12px] font-semibold text-[#34c759]">Done</p>
+            <motion.span
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: 0.2 + i * 0.08,
+                type: "spring",
+                stiffness: 400,
+                damping: 14,
+              }}
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-[#34c759] text-[10px] font-bold !text-white"
+            >
+              ✓
+            </motion.span>
           </motion.div>
         ))}
       </div>
-      <div className="mt-4 flex items-center gap-3 rounded-[16px] bg-[#f5f5f7] p-3">
-        <div className="relative h-9 w-9 overflow-hidden rounded-full">
+      <div className="relative mt-4 flex items-center gap-3 rounded-[16px] bg-[#f5f5f7] p-3">
+        <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-white">
           <Image
             src="/me/portrait.jpg"
             alt=""
@@ -183,9 +204,12 @@ function ReleaseCard() {
             sizes="36px"
           />
         </div>
-        <p className="text-[13px] font-semibold text-[#1d1d1f]">
-          Reply in {site.responseTime}
-        </p>
+        <div>
+          <p className="text-[13px] font-semibold text-[#1d1d1f]">
+            Reply in {site.responseTime}
+          </p>
+          <p className="text-[11px] text-[#86868b]">Launch without panic</p>
+        </div>
       </div>
     </CardShell>
   );
