@@ -9,12 +9,12 @@ export function Footer() {
   return (
     <footer className="relative pb-10 pt-6">
       <div className="shell-wide">
-        <div className="apple-card px-7 py-12 md:px-12 md:py-14">
-          <div className="grid gap-12 md:grid-cols-12 md:gap-8">
+        <div className="apple-card px-5 py-10 sm:px-7 sm:py-12 md:px-12 md:py-14">
+          <div className="grid gap-10 md:grid-cols-12 md:gap-8">
             <div className="md:col-span-5">
               <Link
                 href="/"
-                className="font-display text-2xl font-bold tracking-[-0.04em]"
+                className="font-display text-[22px] font-bold tracking-[-0.04em] sm:text-2xl"
               >
                 {site.name}
               </Link>

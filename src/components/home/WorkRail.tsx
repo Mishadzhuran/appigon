@@ -39,7 +39,7 @@ function CaseRow({
         <button
           type="button"
           onClick={() => onOpen(item)}
-          className="relative min-h-[280px] overflow-hidden bg-[#f5f5f7] text-left lg:min-h-[380px]"
+          className="relative min-h-[220px] overflow-hidden bg-[#f5f5f7] text-left sm:min-h-[280px] lg:min-h-[380px]"
         >
           <Image
             src={item.image}
@@ -49,11 +49,11 @@ function CaseRow({
             sizes="(max-width:1024px) 100vw, 50vw"
           />
         </button>
-        <div className="flex flex-col justify-center px-8 py-10 md:px-12">
+        <div className="flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 md:px-12">
           <p className="text-[12px] font-semibold tracking-[0.14em] text-[#86868b] uppercase">
             {item.category}
           </p>
-          <h3 className="mt-3 text-[28px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[34px]">
+          <h3 className="mt-3 text-[24px] font-semibold tracking-[-0.03em] text-[#1d1d1f] sm:text-[28px] md:text-[34px]">
             {item.title}
           </h3>
           <p className="mt-2 text-[15px] font-medium text-[#0071e3]">

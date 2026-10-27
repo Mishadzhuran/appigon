@@ -85,7 +85,7 @@ export function ScrollChapters() {
                   y: on ? -8 : 0,
                   scale: on ? 1.02 : 1,
                 }}
-                className={`rounded-[28px] p-6 text-left md:rounded-[32px] md:p-7 ${
+                className={`rounded-[24px] p-5 text-left sm:rounded-[28px] sm:p-6 md:rounded-[32px] md:p-7 ${
                   on
                     ? "bg-white/90 shadow-[0_24px_60px_rgba(0,113,227,0.18)] ring-1 ring-[#0071e3]/25 backdrop-blur-xl"
                     : "bg-white/75 shadow-[0_12px_36px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] backdrop-blur-xl"
@@ -97,18 +97,18 @@ export function ScrollChapters() {
                       backgroundColor: on ? "#0071e3" : "#f5f5f7",
                       color: on ? "#ffffff" : "#1d1d1f",
                     }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full text-[13px] font-semibold"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-semibold sm:h-10 sm:w-10 sm:text-[13px]"
                   >
                     {step.n}
                   </motion.span>
-                  <span className="text-[13px] font-medium text-[#86868b]">
+                  <span className="text-[12px] font-medium text-[#86868b] sm:text-[13px]">
                     {step.detail}
                   </span>
                 </div>
-                <h3 className="mt-6 text-[22px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
+                <h3 className="mt-4 text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f] sm:mt-6 sm:text-[22px]">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-[#6e6e73]">
+                <p className="mt-1.5 text-[14px] leading-relaxed text-[#6e6e73] sm:mt-2 sm:text-[15px]">
                   {step.line}
                 </p>
               </motion.button>

@@ -59,7 +59,7 @@ export function Navbar() {
           <div className="flex items-center gap-1.5">
             <Link
               href="/contact"
-              className="hidden rounded-full bg-[#1d1d1f] px-4 py-2 text-[13px] font-medium !text-white transition hover:bg-black sm:inline-flex"
+              className="rounded-full bg-[#1d1d1f] px-3.5 py-2 text-[13px] font-medium !text-white transition hover:bg-black sm:px-4"
             >
               Contact
             </Link>
@@ -100,7 +100,15 @@ export function Navbar() {
                 </Link>
               ))}
             </div>
-            <p className="text-base text-muted">{site.email}</p>
+            <div className="space-y-4">
+              <Link
+                href="/contact"
+                className="flex w-full items-center justify-center rounded-full bg-[#1d1d1f] px-6 py-3.5 text-[15px] font-semibold !text-white"
+              >
+                Contact
+              </Link>
+              <p className="text-center text-base text-muted">{site.email}</p>
+            </div>
           </div>
         </div>
       ) : null}

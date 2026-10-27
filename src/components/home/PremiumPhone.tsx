@@ -386,73 +386,51 @@ const TAB_ICONS = [
 ];
 
 function DynamicIsland({ live }: { live: boolean }) {
+  /**
+   * Opaque black mask above the device PNG (z above frame).
+   * Sized from the asset’s island: ~3.25–7.1% tall, ~28% wide.
+   */
   return (
-    <>
-      <div className="pointer-events-none absolute inset-0 z-[25]">
-        <div
-          className="absolute left-1/2 -translate-x-1/2 bg-[#f5f5f7]"
-          style={{
-            top: "1.7%",
-            height: "1.55%",
-            width: "52%",
-            borderRadius: 999,
-          }}
-        />
-      </div>
-      <div
-        className={`pointer-events-none absolute inset-0 ${
-          live ? "z-[35]" : "z-[25]"
-        }`}
+    <div className="pointer-events-none absolute inset-0 z-50">
+      <motion.div
+        animate={{ width: live ? "40%" : "30%" }}
+        transition={spring}
+        className="absolute left-0 right-0 mx-auto overflow-hidden rounded-full"
+        style={{ top: "3.2%", height: "4.05%" }}
       >
+        {/* Dedicated paint layer — solid mask over PNG cameras */}
         <div
-          className="absolute left-1/2 flex -translate-x-1/2 justify-center"
-          style={{ top: "3.2%" }}
-        >
-          <motion.div
-            animate={{ width: live ? 114 : 78 }}
-            transition={spring}
-            className="relative flex h-[22px] items-center overflow-hidden rounded-full bg-black"
-          >
-            <AnimatePresence initial={false} mode="wait">
-              {live ? (
-                <motion.div
-                  key="live"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18 }}
-                  className="flex w-full items-center gap-1.5 px-2.5"
-                >
-                  <motion.span
-                    animate={{ opacity: [1, 0.4, 1] }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34c759]"
-                  />
-                  <span className="text-[7px] font-semibold tracking-wide !text-white/90">
-                    Live
-                  </span>
-                  <span className="ml-auto h-[10px] w-[10px] shrink-0 rounded-full bg-[#1a283c]" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="idle"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="relative h-full w-full"
-                >
-                  <span className="absolute right-[5px] top-1/2 h-[10px] w-[10px] -translate-y-1/2 rounded-full bg-[#1a283c]" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      </div>
-    </>
+          className="absolute inset-[-2px] rounded-full"
+          style={{ backgroundColor: "#000000" }}
+        />
+        <AnimatePresence initial={false} mode="wait">
+          {live ? (
+            <motion.div
+              key="live"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="relative z-10 flex h-full w-full items-center gap-1.5 px-3"
+            >
+              <motion.span
+                animate={{ opacity: [1, 0.4, 1] }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34c759]"
+              />
+              <span className="text-[7px] font-semibold tracking-wide !text-white/90">
+                Live
+              </span>
+              <span className="ml-auto h-[9px] w-[9px] shrink-0 rounded-full bg-[#0a0a0a] ring-1 ring-white/15" />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 }
 
@@ -479,9 +457,8 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
   return (
     <div className={`relative mx-auto ${className}`}>
       <div
-        className="relative mx-auto"
+        className="relative mx-auto w-[min(220px,68vw)] sm:w-[min(240px,72vw)] md:w-[270px]"
         style={{
-          width: 270,
           aspectRatio: "391 / 800",
           filter:
             "drop-shadow(0 28px 50px rgba(0,0,0,0.18)) drop-shadow(0 8px 16px rgba(0,0,0,0.08))",
@@ -489,7 +466,7 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
       >
         <div
           className="absolute inset-0 overflow-hidden"
-          style={{ borderRadius: 48 }}
+          style={{ borderRadius: "12.3%" }}
         >
           <div
             className="absolute z-0 overflow-hidden bg-[#f5f5f7]"
@@ -498,11 +475,14 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
               right: "5.2%",
               top: "1.55%",
               bottom: "1.9%",
-              borderRadius: 40,
+              borderRadius: "10.2%",
             }}
           >
             <div className="absolute inset-0 flex flex-col">
-              <div className="flex min-h-0 flex-1 flex-col px-3 pt-10 pb-[4.5rem]">
+              <div
+                className="flex min-h-0 flex-1 flex-col px-2.5 pb-[4.5rem] sm:px-3"
+                style={{ paddingTop: "9.6%" }}
+              >
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step.id}
@@ -574,8 +554,6 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
             </div>
           </div>
 
-          <DynamicIsland live={step.id === "launch"} />
-
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/devices/iphone-device.png?v=island3"
@@ -583,6 +561,9 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
             className="pointer-events-none absolute inset-0 z-30 h-full w-full select-none"
             draggable={false}
           />
+
+          {/* After the frame so the solid mask always paints on top of PNG cameras */}
+          <DynamicIsland live={step.id === "launch"} />
         </div>
       </div>
     </div>
