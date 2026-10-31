@@ -217,18 +217,18 @@ function IconChip({ t, md }: { t: Tool; md: boolean }) {
       style={{ left, top, width: size, height: size, zIndex: behind ? 1 : 20 }}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{
-        opacity: behind ? 0.88 : 1,
+        opacity: behind ? 0.85 : 1,
         scale: 1,
-        y: [0, behind ? -2 : -3.5, 0],
+        y: [0, behind ? -2.5 : -4, 0],
       }}
       transition={{
-        opacity: { duration: 0.55, delay: t.delay },
-        scale: { duration: 0.55, delay: t.delay },
+        opacity: { duration: 0.5, delay: t.delay, ease: [0.23, 1, 0.32, 1] },
+        scale: { duration: 0.5, delay: t.delay, ease: [0.23, 1, 0.32, 1] },
         y: {
-          duration: 10 + t.delay * 3,
+          duration: 9 + t.delay * 2.5,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: 0.7 + t.delay,
+          delay: 0.6 + t.delay,
         },
       }}
     >

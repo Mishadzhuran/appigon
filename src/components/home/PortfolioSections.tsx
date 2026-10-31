@@ -11,7 +11,7 @@ export function FinalCTA() {
   return (
     <section className="pb-24 pt-6 md:pb-32">
       <Shell>
-        <div className="rounded-[32px] bg-white px-8 py-14 text-center shadow-[0_12px_40px_rgba(0,0,0,0.06)] md:px-16 md:py-20">
+        <div className="rounded-[28px] bg-white px-7 py-12 text-center shadow-[0_12px_40px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] sm:rounded-[32px] sm:px-8 sm:py-14 md:px-16 md:py-20">
           <p className="text-[12px] font-semibold tracking-[0.16em] text-[#86868b] uppercase">
             Contact
           </p>
@@ -22,16 +22,16 @@ export function FinalCTA() {
             Tell me what you’re building. I’ll help make it clear, polished, and
             ready for people — reply within {site.responseTime}.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
             <a
               href="/contact"
-              className="inline-flex rounded-full bg-[#0071e3] px-7 py-3.5 text-[14px] font-semibold !text-white transition hover:bg-[#0077ed]"
+              className="pressable inline-flex items-center justify-center rounded-full bg-[#0071e3] px-7 py-3.5 text-[14px] font-semibold !text-white shadow-[0_8px_24px_rgba(0,113,227,0.25)] hover:bg-[#0077ed]"
             >
               Start a conversation
             </a>
             <a
               href={`mailto:${site.email}`}
-              className="px-4 py-3 text-[14px] font-medium text-[#6e6e73] hover:text-[#1d1d1f]"
+              className="px-4 py-3 text-center text-[14px] font-medium text-[#6e6e73] transition-colors duration-[var(--duration-ui)] ease-[var(--ease-out)] hover:text-[#1d1d1f]"
             >
               {site.email}
             </a>

@@ -3,17 +3,23 @@
 import {
   animate,
   motion,
+  useInView,
   useMotionValue,
+  useReducedMotion,
   useSpring,
   useTransform,
 } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { cases, site } from "@/data/site";
 import { Shell } from "@/components/ui/Primitives";
+import { easeOut, springSoft, springSnap, springUi } from "@/lib/motion";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const cardShadow =
+  "0 1px 1px rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.04)";
+const cardShadowHover =
+  "0 1px 1px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.06), 0 32px 64px rgba(0,0,0,0.06)";
 
 function CardShell({
   children,
@@ -24,44 +30,98 @@ function CardShell({
   className?: string;
   delay?: number;
 }) {
+  const reduce = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.55, delay, ease }}
-      whileHover={{ y: -3 }}
-      className={`rounded-[28px] bg-white/90 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.07)] ring-1 ring-black/[0.05] backdrop-blur-xl md:rounded-[32px] md:p-6 ${className}`}
+      initial={reduce ? false : { opacity: 0, y: 18, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
+      transition={{ ...springSoft, delay }}
+      whileHover={
+        reduce
+          ? undefined
+          : {
+              y: -3,
+              boxShadow: cardShadowHover,
+              transition: springUi,
+            }
+      }
+      className={`flex h-full flex-col rounded-[28px] bg-white p-6 ring-1 ring-black/[0.04] md:rounded-[32px] md:p-7 ${className}`}
+      style={{ boxShadow: cardShadow }}
     >
       {children}
     </motion.div>
   );
 }
 
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[13px] font-medium tracking-[-0.01em] text-[#86868b]">
+      {children}
+    </p>
+  );
+}
+
+function CardTitle({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[22px] font-semibold leading-tight tracking-[-0.035em] text-[#1d1d1f] md:text-[24px]">
+      {children}
+    </p>
+  );
+}
+
 function PulseCard() {
   const rows = [
-    { label: "Discovery call", meta: "Booked", tone: "text-[#0071e3] bg-[#eef3ff]" },
-    { label: "Written scope", meta: "Signed", tone: "text-[#248a3d] bg-[#e8f8ef]" },
-    { label: "First TestFlight", meta: "Week 2–3", tone: "text-[#1d1d1f] bg-[#f5f5f7]" },
+    {
+      label: "Discovery call",
+      meta: "Booked",
+      tone: "text-[#0071e3] bg-[#0071e3]/[0.08]",
+    },
+    {
+      label: "Written scope",
+      meta: "Signed",
+      tone: "text-[#1f8a3b] bg-[#34c759]/[0.12]",
+    },
+    {
+      label: "First TestFlight",
+      meta: "Week 2–3",
+      tone: "text-[#1d1d1f] bg-black/[0.04]",
+    },
   ];
+
   return (
-    <CardShell delay={0.05}>
-      <p className="text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-        Week one
-      </p>
-      <ul className="mt-4 space-y-2">
+    <CardShell delay={0.04} className="md:min-h-[292px]">
+      <SectionLabel>First seven days</SectionLabel>
+      <CardTitle>Week one</CardTitle>
+      <ul className="mt-auto pt-5">
         {rows.map((r, i) => (
           <motion.li
             key={r.label}
-            initial={{ opacity: 0, x: -8 }}
+            initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.08 + i * 0.07, duration: 0.35, ease }}
-            className="flex items-center justify-between gap-3 rounded-[14px] bg-[#f5f5f7] px-3.5 py-3"
+            transition={{ delay: 0.12 + i * 0.07, duration: 0.4, ease: easeOut }}
+            className={`relative flex items-center justify-between gap-3 py-3.5 ${
+              i < rows.length - 1 ? "border-b border-black/[0.05]" : ""
+            }`}
           >
-            <p className="text-[14px] font-semibold text-[#1d1d1f]">{r.label}</p>
+            {i < rows.length - 1 ? (
+              <span
+                aria-hidden
+                className="absolute left-[7px] top-[calc(50%+12px)] h-[calc(100%-10px)] w-px bg-[#1d1d1f]/15"
+              />
+            ) : null}
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="relative z-[1] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-white ring-[2.5px] ring-[#1d1d1f]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1d1d1f]" />
+              </span>
+              <p className="truncate text-[15px] font-medium tracking-[-0.015em] text-[#1d1d1f]">
+                {r.label}
+              </p>
+            </div>
             <span
-              className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${r.tone}`}
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[-0.01em] ${r.tone}`}
             >
               {r.meta}
             </span>
@@ -73,142 +133,161 @@ function PulseCard() {
 }
 
 function UsersCard() {
-  const count = useMotionValue(5000);
-  const spring = useSpring(count, { stiffness: 55, damping: 18 });
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.4 });
+  const reduce = useReducedMotion();
+  const count = useMotionValue(0);
+  const spring = useSpring(count, { stiffness: 60, damping: 20, mass: 0.8 });
   const display = useTransform(spring, (v) =>
     `${Math.round(v).toLocaleString("en-US")}+`,
   );
 
   useEffect(() => {
-    count.set(0);
+    if (!inView) return;
+    if (reduce) {
+      count.set(5000);
+      return;
+    }
     const controls = animate(count, 5000, {
-      duration: 1.7,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0.2,
+      duration: 1.55,
+      ease: [0.16, 1, 0.3, 1],
+      delay: 0.12,
     });
     return controls.stop;
-  }, [count]);
+  }, [inView, count, reduce]);
 
-  const bars = [30, 38, 34, 50, 46, 60, 54, 72, 66, 84, 78, 96];
+  const bars = [28, 36, 32, 48, 44, 58, 52, 70, 64, 82, 76, 94];
 
   return (
-    <CardShell delay={0.08} className="relative overflow-hidden">
+    <CardShell delay={0.08} className="relative overflow-hidden md:min-h-[292px]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[#34c759]/25 blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#34c759]/[0.14] blur-3xl"
       />
-      <div className="relative flex items-center gap-3">
-        <motion.div
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f8ef]"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M3 11.5L6.2 8.1l2.3 2.2L13 5"
-              stroke="#34c759"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M10 5h3v3"
-              stroke="#34c759"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </motion.div>
-        <div>
-          <p className="text-[13px] font-medium text-[#6e6e73]">Live users</p>
-          <motion.p className="text-[28px] font-semibold tracking-[-0.04em] text-[#1d1d1f]">
-            {display}
-          </motion.p>
+      <div ref={ref} className="relative flex h-full flex-col">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <SectionLabel>Live users</SectionLabel>
+            <motion.p className="mt-1 text-[40px] font-semibold leading-none tracking-[-0.045em] text-[#1d1d1f] md:text-[44px]">
+              {display}
+            </motion.p>
+          </div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#34c759]/[0.12]">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path
+                d="M3 11.5L6.2 8.1l2.3 2.2L13 5"
+                stroke="#1f8a3b"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M10 5h3v3"
+                stroke="#1f8a3b"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
         </div>
+
+        <div className="relative mt-auto flex h-[72px] items-end gap-[5px] pt-8">
+          {bars.map((h, i) => (
+            <motion.span
+              key={i}
+              className="origin-bottom flex-1 rounded-[5px] bg-gradient-to-t from-[#34c759]/35 to-[#30d158]"
+              initial={reduce ? false : { height: 0, opacity: 0.4 }}
+              whileInView={{ height: `${h}%`, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: 0.18 + i * 0.035,
+                duration: 0.55,
+                ease: easeOut,
+              }}
+            />
+          ))}
+        </div>
+        <p className="relative mt-4 text-[13px] font-medium tracking-[-0.01em] text-[#1f8a3b]">
+          Growing every launch
+        </p>
       </div>
-      <div className="relative mt-5 flex h-12 items-end gap-1">
-        {bars.map((h, i) => (
-          <motion.span
-            key={i}
-            className="origin-bottom flex-1 rounded-sm bg-gradient-to-t from-[#34c759]/50 to-[#34c759]"
-            initial={{ height: 0 }}
-            whileInView={{ height: `${h}%` }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.12 + i * 0.04, duration: 0.45, ease }}
-          />
-        ))}
-      </div>
-      <p className="relative mt-3 text-[13px] font-semibold text-[#34c759]">
-        Growing every launch
-      </p>
     </CardShell>
   );
 }
 
 function ReleaseCard() {
   const items = ["Privacy labels", "Screenshots", "Review notes"];
+
   return (
-    <CardShell delay={0.1} className="relative overflow-hidden">
+    <CardShell delay={0.12} className="relative overflow-hidden md:min-h-[292px]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-[#0071e3]/12 blur-3xl"
+        className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full bg-[#0071e3]/[0.1] blur-3xl"
       />
       <div className="relative flex items-start justify-between gap-3">
-        <p className="text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-          App Store
-        </p>
-        <motion.span
-          animate={{ scale: [1, 1.04, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          className="rounded-full bg-[#0071e3] px-3 py-1.5 text-[12px] font-semibold !text-white shadow-[0_8px_20px_rgba(0,113,227,0.3)]"
-        >
+        <div>
+          <SectionLabel>Submission</SectionLabel>
+          <CardTitle>App Store</CardTitle>
+        </div>
+        <span className="rounded-full bg-[#0071e3] px-3 py-1.5 text-[12px] font-semibold tracking-[-0.01em] !text-white shadow-[0_6px_16px_rgba(0,113,227,0.28)]">
           Ready
-        </motion.span>
+        </span>
       </div>
-      <div className="relative mt-4 space-y-2.5">
+
+      <div className="relative mt-5 space-y-1">
         {items.map((t, i) => (
           <motion.div
             key={t}
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.08 + i * 0.06, duration: 0.3, ease }}
-            className="flex items-center justify-between"
+            transition={{ delay: 0.14 + i * 0.06, duration: 0.35, ease: easeOut }}
+            className="flex items-center justify-between gap-3 rounded-[14px] px-1 py-2.5"
           >
-            <p className="text-[14px] text-[#1d1d1f]">{t}</p>
+            <p className="text-[15px] font-medium tracking-[-0.015em] text-[#1d1d1f]">
+              {t}
+            </p>
             <motion.span
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
+              initial={{ scale: 0.6, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
               transition={{
-                delay: 0.2 + i * 0.08,
-                type: "spring",
-                stiffness: 400,
-                damping: 14,
+                ...springSnap,
+                delay: 0.28 + i * 0.08,
               }}
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-[#34c759] text-[10px] font-bold !text-white"
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-[#34c759]"
+              aria-hidden
             >
-              ✓
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path
+                  d="M2 5.2L4.1 7.2L8 2.8"
+                  stroke="white"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </motion.span>
           </motion.div>
         ))}
       </div>
-      <div className="relative mt-4 flex items-center gap-3 rounded-[16px] bg-[#f5f5f7] p-3">
-        <div className="relative h-9 w-9 overflow-hidden rounded-full ring-2 ring-white">
+
+      <div className="relative mt-auto flex items-center gap-3 rounded-[18px] bg-[#f5f5f7] p-3.5 pt-4">
+        <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-white shadow-sm">
           <Image
             src="/me/portrait.jpg"
             alt=""
             fill
             className="object-cover object-[center_18%]"
-            sizes="36px"
+            sizes="40px"
           />
         </div>
-        <div>
-          <p className="text-[13px] font-semibold text-[#1d1d1f]">
+        <div className="min-w-0">
+          <p className="text-[14px] font-semibold tracking-[-0.015em] text-[#1d1d1f]">
             Reply in {site.responseTime}
           </p>
-          <p className="text-[11px] text-[#86868b]">Launch without panic</p>
+          <p className="text-[12px] text-[#86868b]">Launch without panic</p>
         </div>
       </div>
     </CardShell>
@@ -222,25 +301,25 @@ function NumbersCard() {
     { value: "4.9", label: "Score" },
     { value: "1 day", label: "Reply" },
   ];
+
   return (
-    <CardShell delay={0.08}>
-      <p className="text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-        Track record
-      </p>
-      <div className="mt-4 grid grid-cols-2 gap-2.5">
+    <CardShell delay={0.06} className="md:min-h-[280px]">
+      <SectionLabel>Proof</SectionLabel>
+      <CardTitle>Track record</CardTitle>
+      <div className="mt-auto grid grid-cols-2 gap-2.5 pt-6">
         {items.map((s, i) => (
           <motion.div
             key={s.label}
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.08 + i * 0.05, duration: 0.35, ease }}
-            className="rounded-[14px] bg-[#f5f5f7] px-3 py-3"
+            transition={{ delay: 0.1 + i * 0.05, duration: 0.4, ease: easeOut }}
+            className="rounded-[18px] bg-[#f5f5f7] px-3.5 py-4"
           >
-            <p className="text-[22px] font-semibold tracking-[-0.04em] text-[#1d1d1f]">
+            <p className="text-[28px] font-semibold leading-none tracking-[-0.045em] text-[#1d1d1f]">
               {s.value}
             </p>
-            <p className="mt-0.5 text-[12px] text-[#6e6e73]">{s.label}</p>
+            <p className="mt-2 text-[12px] font-medium text-[#6e6e73]">{s.label}</p>
           </motion.div>
         ))}
       </div>
@@ -250,28 +329,48 @@ function NumbersCard() {
 
 function WorkCard() {
   return (
-    <CardShell delay={0.1}>
-      <p className="text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-        Recent ships
-      </p>
-      <ul className="mt-4 space-y-2">
+    <CardShell delay={0.1} className="md:min-h-[280px]">
+      <div className="flex items-baseline justify-between gap-3">
+        <div>
+          <SectionLabel>Portfolio</SectionLabel>
+          <CardTitle>Recent ships</CardTitle>
+        </div>
+        <Link
+          href="/#work"
+          className="pressable text-[13px] font-semibold tracking-[-0.01em] text-[#0071e3]"
+        >
+          See all
+        </Link>
+      </div>
+      <ul className="mt-auto space-y-1.5 pt-5">
         {cases.slice(0, 4).map((c, i) => (
           <motion.li
             key={c.slug}
-            initial={{ opacity: 0, x: -6 }}
+            initial={{ opacity: 0, x: -8 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.06 + i * 0.05, duration: 0.35, ease }}
-            className="flex items-center gap-3 rounded-[14px] bg-[#f5f5f7] px-3 py-2.5"
+            transition={{ delay: 0.1 + i * 0.05, duration: 0.35, ease: easeOut }}
           >
-            <span
-              className="h-8 w-8 shrink-0 rounded-[10px]"
-              style={{ backgroundColor: c.color }}
-            />
-            <p className="min-w-0 flex-1 truncate text-[14px] font-semibold text-[#1d1d1f]">
-              {c.title}
-            </p>
-            <span className="shrink-0 text-[11px] text-[#86868b]">{c.year}</span>
+            <Link
+              href="/#work"
+              className="group flex items-center gap-3 rounded-[16px] px-1.5 py-2 transition-colors duration-200 hover:bg-[#f5f5f7]"
+            >
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] text-[13px] font-semibold tracking-[-0.02em] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]"
+                style={{
+                  backgroundColor: c.color,
+                  color: c.color === "#9fe870" ? "#1d1d1f" : "#fff",
+                }}
+              >
+                {c.title.slice(0, 1)}
+              </span>
+              <p className="min-w-0 flex-1 truncate text-[14px] font-semibold tracking-[-0.015em] text-[#1d1d1f]">
+                {c.title}
+              </p>
+              <span className="shrink-0 text-[12px] tabular-nums text-[#86868b]">
+                {c.year}
+              </span>
+            </Link>
           </motion.li>
         ))}
       </ul>
@@ -286,63 +385,87 @@ function ClientsCard() {
     { k: "Scope", v: "Written first" },
     { k: "After", v: "Still here" },
   ];
+
   return (
     <CardShell
-      delay={0.12}
-      className="relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0f4ff]"
+      delay={0.14}
+      className="relative overflow-hidden md:min-h-[280px]"
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-10 -right-8 h-36 w-36 rounded-full bg-[#0071e3]/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-16 -right-10 h-48 w-48 rounded-full bg-[#0071e3]/[0.08] blur-3xl"
       />
-      <p className="relative text-[20px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-        Working together
-      </p>
-      <div className="relative mt-4 grid grid-cols-2 gap-2">
-        {points.map((s, i) => (
-          <motion.div
-            key={s.k}
-            initial={{ opacity: 0, y: 6 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.08 + i * 0.05, duration: 0.3, ease }}
-            className="rounded-[14px] bg-white/90 px-3 py-2.5 ring-1 ring-black/[0.04]"
-          >
-            <p className="text-[11px] font-semibold text-[#86868b]">{s.k}</p>
-            <p className="mt-0.5 text-[13px] font-semibold text-[#1d1d1f]">
-              {s.v}
-            </p>
-          </motion.div>
-        ))}
+      <SectionLabel>How we work</SectionLabel>
+      <CardTitle>Working together</CardTitle>
+      <div className="relative mt-auto space-y-4 pt-6">
+        <div className="grid grid-cols-2 gap-2">
+          {points.map((s, i) => (
+            <motion.div
+              key={s.k}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: 0.12 + i * 0.05,
+                duration: 0.35,
+                ease: easeOut,
+              }}
+              className="rounded-[16px] bg-[#f5f5f7] px-3.5 py-3"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#86868b]">
+                {s.k}
+              </p>
+              <p className="mt-1 text-[14px] font-semibold tracking-[-0.015em] text-[#1d1d1f]">
+                {s.v}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+        <Link
+          href="/contact"
+          className="pressable relative flex items-center justify-between rounded-full bg-[#1d1d1f] px-5 py-3.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)] transition-[background-color,box-shadow] duration-200 hover:bg-black hover:shadow-[0_14px_32px_rgba(0,0,0,0.22)]"
+        >
+          <span className="text-[14px] font-semibold tracking-[-0.015em] !text-white">
+            Start a conversation
+          </span>
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[14px] !text-white">
+            →
+          </span>
+        </Link>
       </div>
-      <Link
-        href="/contact"
-        className="relative mt-4 flex items-center justify-between rounded-[16px] bg-[#1d1d1f] px-4 py-3 transition hover:bg-black"
-      >
-        <span className="text-[14px] font-semibold !text-white">
-          Start a conversation
-        </span>
-        <span className="text-[13px] !text-white/70">→</span>
-      </Link>
     </CardShell>
   );
 }
 
 export function ProductPopups() {
+  const reduce = useReducedMotion();
+
   return (
-    <section className="relative overflow-x-clip py-12 md:py-20">
+    <section className="relative overflow-x-clip py-14 md:py-24">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-24 mx-auto h-[280px] max-w-3xl rounded-full bg-[#34c759]/08 blur-3xl"
+        className="pointer-events-none absolute inset-x-0 top-16 mx-auto h-[320px] max-w-4xl rounded-full bg-[radial-gradient(ellipse_at_center,rgba(52,199,89,0.09),transparent_70%)]"
       />
       <Shell className="relative">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-[clamp(1.9rem,4vw,2.7rem)] font-semibold tracking-[-0.04em] text-[#1d1d1f]">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.5, ease: easeOut }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <p className="text-[13px] font-semibold tracking-[0.08em] text-[#86868b] uppercase">
+            Outcomes
+          </p>
+          <h2 className="mt-3 text-[clamp(2rem,4.2vw,2.85rem)] font-semibold tracking-[-0.045em] text-[#1d1d1f]">
             What you get
           </h2>
-        </div>
+          <p className="mx-auto mt-3 max-w-md text-[17px] leading-relaxed tracking-[-0.015em] text-[#6e6e73]">
+            Clear process, shipped products, and a partner who stays after launch.
+          </p>
+        </motion.div>
 
-        <div className="relative mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3 md:gap-5">
+        <div className="relative mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
           <PulseCard />
           <UsersCard />
           <ReleaseCard />

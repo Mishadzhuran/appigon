@@ -28,11 +28,11 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
-        <div className="flex w-full max-w-[720px] items-center justify-between gap-2 rounded-full border border-black/8 bg-white/75 px-2 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.06)] backdrop-blur-2xl md:px-2.5">
+      <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] md:pt-5">
+        <div className="liquid-glass flex w-full max-w-[720px] items-center justify-between gap-2 rounded-full px-2 py-2 md:px-2.5">
           <Link
             href="/"
-            className="rounded-full px-4 py-2 font-display text-[15px] font-bold tracking-[-0.04em] text-text"
+            className="pressable rounded-full px-4 py-2 font-display text-[15px] font-bold tracking-[-0.04em] text-text"
           >
             {site.shortName}
           </Link>
@@ -44,7 +44,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-full px-3.5 py-2 text-[13px] font-medium tracking-[-0.01em] transition-colors ${
+                  className={`rounded-full px-3.5 py-2 text-[13px] font-medium tracking-[-0.01em] transition-[color,background-color] duration-[var(--duration-ui)] ease-[var(--ease-out)] ${
                     active
                       ? "bg-black/[0.06] text-text"
                       : "text-muted hover:text-text"
@@ -59,7 +59,7 @@ export function Navbar() {
           <div className="flex items-center gap-1.5">
             <Link
               href="/contact"
-              className="rounded-full bg-[#1d1d1f] px-3.5 py-2 text-[13px] font-medium !text-white transition hover:bg-black sm:px-4"
+              className="pressable rounded-full bg-[#1d1d1f] px-3.5 py-2 text-[13px] font-medium !text-white hover:bg-black sm:px-4"
             >
               Contact
             </Link>
@@ -68,16 +68,16 @@ export function Navbar() {
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className="relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full sm:hidden"
+              className="pressable relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full sm:hidden"
             >
               <span
-                className={`h-px w-4 bg-text transition duration-300 ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
+                className={`h-px w-4 bg-text transition-[transform,opacity] duration-[var(--duration-ui)] ease-[var(--ease-out)] ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
               />
               <span
-                className={`h-px w-4 bg-text transition duration-300 ${open ? "opacity-0" : ""}`}
+                className={`h-px w-4 bg-text transition-opacity duration-[var(--duration-ui)] ease-[var(--ease-out)] ${open ? "opacity-0" : ""}`}
               />
               <span
-                className={`h-px w-4 bg-text transition duration-300 ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
+                className={`h-px w-4 bg-text transition-[transform,opacity] duration-[var(--duration-ui)] ease-[var(--ease-out)] ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
               />
             </button>
           </div>
@@ -85,8 +85,8 @@ export function Navbar() {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-40 animate-[fadeIn_0.3s_ease] bg-[#f5f5f7]/95 backdrop-blur-xl sm:hidden">
-          <div className="flex h-full flex-col justify-between px-6 pb-10 pt-28">
+        <div className="fixed inset-0 z-40 animate-[fadeIn_0.28s_var(--ease-out)] bg-[#f5f5f7]/95 backdrop-blur-xl sm:hidden">
+          <div className="flex h-full flex-col justify-between px-6 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-28">
             <div className="space-y-1">
               {[{ href: "/", label: "Home" }, ...navLinks].map((link) => (
                 <Link
@@ -103,7 +103,7 @@ export function Navbar() {
             <div className="space-y-4">
               <Link
                 href="/contact"
-                className="flex w-full items-center justify-center rounded-full bg-[#1d1d1f] px-6 py-3.5 text-[15px] font-semibold !text-white"
+                className="pressable flex w-full items-center justify-center rounded-full bg-[#1d1d1f] px-6 py-3.5 text-[15px] font-semibold !text-white"
               >
                 Contact
               </Link>

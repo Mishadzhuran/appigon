@@ -4,14 +4,16 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
+  useReducedMotion,
   useTransform,
   animate,
 } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
+import { easeOut, springSnap, springSoft, springUi } from "@/lib/motion";
 
-const ease = [0.22, 1, 0.36, 1] as const;
-const spring = { type: "spring" as const, stiffness: 400, damping: 28 };
-const soft = { type: "spring" as const, stiffness: 280, damping: 24 };
+const ease = easeOut;
+const spring = springSnap;
+const soft = springSoft;
 
 const FLOW = [
   { id: "talk", label: "Talk", title: "Talk" },
@@ -28,7 +30,11 @@ function Glass({
   className?: string;
 }) {
   return (
-    <div className={`liquid-glass rounded-[16px] ${className}`}>{children}</div>
+    <div
+      className={`rounded-[16px] bg-white/78 ring-1 ring-black/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] backdrop-blur-xl ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -392,12 +398,12 @@ function DynamicIsland({ live }: { live: boolean }) {
    */
   return (
     <div className="pointer-events-none absolute inset-0 z-50">
-      <motion.div
-        animate={{ width: live ? "40%" : "30%" }}
-        transition={spring}
-        className="absolute left-0 right-0 mx-auto overflow-hidden rounded-full"
-        style={{ top: "3.2%", height: "4.05%" }}
-      >
+        <motion.div
+          animate={{ width: live ? "40%" : "30%" }}
+          transition={springUi}
+          className="absolute left-0 right-0 mx-auto overflow-hidden rounded-full"
+          style={{ top: "3.2%", height: "4.05%" }}
+        >
         {/* Dedicated paint layer — solid mask over PNG cameras */}
         <div
           className="absolute inset-[-2px] rounded-full"
@@ -437,17 +443,18 @@ function DynamicIsland({ live }: { live: boolean }) {
 export function PremiumPhone({ className = "" }: { className?: string }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const reduce = useReducedMotion();
   const Body = BODIES[i];
   const step = FLOW[i];
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || reduce) return;
     const id = window.setInterval(
       () => setI((n) => (n + 1) % FLOW.length),
       5200,
     );
     return () => window.clearInterval(id);
-  }, [paused]);
+  }, [paused, reduce]);
 
   const go = (idx: number) => {
     setPaused(true);
@@ -456,17 +463,20 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
 
   return (
     <div className={`relative mx-auto ${className}`}>
-      <div
+      <motion.div
         className="relative mx-auto w-[min(220px,68vw)] sm:w-[min(240px,72vw)] md:w-[270px]"
-        style={{
-          aspectRatio: "391 / 800",
-          filter:
-            "drop-shadow(0 28px 50px rgba(0,0,0,0.18)) drop-shadow(0 8px 16px rgba(0,0,0,0.08))",
-        }}
+        style={{ aspectRatio: "391 / 800" }}
+        initial={reduce ? false : { opacity: 0, transform: "translateY(16px) scale(0.97)" }}
+        animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
+        transition={springUi}
       >
         <div
           className="absolute inset-0 overflow-hidden"
-          style={{ borderRadius: "12.3%" }}
+          style={{
+            borderRadius: "12.3%",
+            filter:
+              "drop-shadow(0 28px 50px rgba(0,0,0,0.18)) drop-shadow(0 8px 16px rgba(0,0,0,0.08))",
+          }}
         >
           <div
             className="absolute z-0 overflow-hidden bg-[#f5f5f7]"
@@ -486,20 +496,23 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.34, ease }}
+                    initial={
+                      reduce
+                        ? false
+                        : { opacity: 0, y: 10, filter: "blur(4px)" }
+                    }
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={
+                      reduce
+                        ? { opacity: 0 }
+                        : { opacity: 0, y: -6, filter: "blur(3px)" }
+                    }
+                    transition={{ duration: 0.28, ease }}
                     className="flex min-h-0 flex-1 flex-col"
                   >
-                    <motion.h3
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, ease }}
-                      className="text-[20px] font-semibold tracking-[-0.045em] text-[#1d1d1f]"
-                    >
+                    <h3 className="text-[20px] font-semibold tracking-[-0.045em] text-[#1d1d1f]">
                       {step.title}
-                    </motion.h3>
+                    </h3>
                     <div className="mt-2.5 min-h-0 flex-1">
                       <Body />
                     </div>
@@ -516,18 +529,18 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
                         key={f.id}
                         type="button"
                         onClick={() => go(idx)}
-                        className="relative flex flex-1 flex-col items-center gap-0.5 rounded-full px-0.5 py-1"
+                        className="relative flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 rounded-full px-0.5 py-1"
                       >
                         {on && (
                           <motion.span
                             layoutId="phone-tab-glow"
-                            className="absolute inset-0 rounded-full bg-white/80 shadow-[0_3px_12px_rgba(0,0,0,0.06)]"
+                            className="absolute inset-[2px] rounded-full bg-white/85 shadow-[0_3px_12px_rgba(0,0,0,0.06)]"
                             transition={spring}
                           />
                         )}
                         <motion.span
-                          animate={{ scale: on ? 1.08 : 1 }}
-                          transition={soft}
+                          animate={{ scale: on ? 1.06 : 1 }}
+                          transition={spring}
                           className={`relative z-10 ${
                             on ? "text-[#0071e3]" : "text-[#8e8e93]"
                           }`}
@@ -565,7 +578,7 @@ export function PremiumPhone({ className = "" }: { className?: string }) {
           {/* After the frame so the solid mask always paints on top of PNG cameras */}
           <DynamicIsland live={step.id === "launch"} />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
